@@ -1,0 +1,3 @@
+[submodule "third_party/zeroclaw"]
+	path = third_party/zeroclaw
+	url = https://github.com/zeroclaw-labs/zeroclaw.git
