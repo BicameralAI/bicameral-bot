@@ -32,6 +32,17 @@ history. That remains a strong default for a git-backed workspace. But tying the
 entire bot model to git/CI would make ingestion automation, hosted review UX,
 and future non-git deployments harder to reason about.
 
+Public survey evidence reinforces this separation. Stack Overflow's 2024 survey
+shows decision-adjacent work spread across Jira, Confluence, Markdown files,
+Notion, GitHub Discussions, Azure DevOps, Obsidian, Slack, Teams, Zoom, Discord,
+and other surfaces. Atlassian/DX developer-experience research reports large
+time losses from workflow inefficiencies. See [Public Developer Survey Implications](../research/public-developer-survey-implications.md).
+
+That evidence argues for connector breadth, but connector breadth increases
+false-authority risk. The more sources Bicameral ingests, the more important it
+is that connectors produce evidence/candidates/hints only while governance policy
+and review commands decide authority.
+
 ## Decision
 
 Separate the bot architecture into event store, ingestion, review, and policy

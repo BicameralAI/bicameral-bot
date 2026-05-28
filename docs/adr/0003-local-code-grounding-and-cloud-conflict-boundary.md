@@ -25,6 +25,12 @@ At the same time, full cross-branch, cross-repo, organization-scale code graph a
 
 Cloud returns evidence, hints, advisories, and `GovernanceResult` proposals. It does not become canonical authority; bot governance and the selected event store substrate still decide what materializes.
 
+### Survey-informed rationale
+
+Public developer surveys make local grounding a baseline requirement, not a paid-only enhancement. Stack Overflow's 2024 AI survey reports broad AI use/planned use while also identifying lack of trust in AI output and lack of codebase context as top team-level adoption blockers. DORA 2024 reports that AI can increase individual productivity, flow, and satisfaction while negatively affecting delivery stability and throughput. See [Public Developer Survey Implications](../research/public-developer-survey-implications.md).
+
+Implication: the public/local bot must inspect the current worktree and produce reviewable `BindingEvidence` before Bicameral can claim to reduce cognitive debt. Paid cloud value should concentrate on scale and precision: cross-repo, cross-branch, historical, shared-cache, blast-radius, and expensive conflict intelligence that local inspection cannot provide.
+
 ## Local Bot Owns
 
 - current-worktree grounding: files, line ranges, symbols, imports/callers/callees when a local index exists, current diff/branch context, commit metadata, tests, deploy/release files;

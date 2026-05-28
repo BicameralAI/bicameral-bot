@@ -26,6 +26,12 @@ ZeroClaw is appropriate because its current architecture already matches the sha
 
 The import is a scaffold, not a domain decision. Bicameral's domain authority remains in its protocol contracts, governance policy, review commands, and storage adapters.
 
+### Survey-informed constraint
+
+Public AI and buyer-behavior surveys support a local daemon/gateway scaffold only if it improves trust, security, code context, auditability, approval gates, and fast proof of value. Stack Overflow, JetBrains, and GitHub report broad AI tool adoption or organizational allowance, but Stack Overflow also reports codebase-context and output-trust concerns. G2's 2024 buyer report highlights short ROI expectations and security-breach scrutiny. See [Public Developer Survey Implications](../research/public-developer-survey-implications.md).
+
+Implication: ZeroClaw's local-first runtime, gateway, security, approval, and audit primitives are useful. Generic assistant surface area should be removed or postponed unless it directly serves Bicameral decision capture, local grounding, review, audit, or safe extension.
+
 ## Imported Source
 
 - Upstream: `https://github.com/zeroclaw-labs/zeroclaw`

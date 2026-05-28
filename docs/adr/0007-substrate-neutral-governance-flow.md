@@ -21,6 +21,18 @@ Bicameral needs one generic governance flow that works across different integrat
 
 The flow must state which parts are core invariants and which parts are safe extension points.
 
+Public survey evidence supports keeping enforcement capability explicit rather
+than assuming every governance result can become a CI check. Stack Overflow's
+2024 data shows important decision and coordination work happening in tickets,
+docs, chat, meetings, and AI-assisted workflows, while DORA 2024 warns that AI
+and platform changes can improve productivity while affecting delivery stability
+and throughput. See [Public Developer Survey Implications](../research/public-developer-survey-implications.md).
+
+Implication: `ci_block` is one mapping for git-backed workspaces with a real
+merge boundary. Non-git or pre-code decisions need honest mappings such as
+`pr_warning`, `dashboard_flag`, `agent_warning`, `slack_notification`,
+`queued_action`, `paused_approval`, or no-op.
+
 ## Decision
 
 Define a **substrate-neutral governance flow** as the only path from source evidence to canonical decision state. Every connector, mod, review surface, and event store substrate maps into this flow. ADR-0001 defines where accepted events are stored; ADR-0007 defines how a candidate becomes eligible to be stored.
