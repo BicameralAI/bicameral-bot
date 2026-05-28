@@ -8,7 +8,7 @@ third_party/zeroclaw
 
 Purpose: use ZeroClaw as the scaffold for Bicameral's local daemon/gateway runtime, not as a wholesale product rename.
 
-See `docs/adr/0005-adopt-zeroclaw-runtime-scaffold.md` for the decision, authority boundary, and extraction plan.
+See `docs/adr/0009-adopt-zeroclaw-runtime-scaffold.md` for the decision, authority boundary, and extraction plan.
 
 ## Initial extraction targets
 

@@ -1,4 +1,4 @@
-# ADR-0005: Adopt ZeroClaw Runtime Scaffold
+# ADR-0009: Adopt ZeroClaw Runtime Scaffold
 
 **Date:** 2026-05-27  
 **Status:** proposed  

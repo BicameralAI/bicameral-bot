@@ -1,0 +1,69 @@
+# ADR-0003: Local Code Grounding and Cloud Conflict Boundary
+
+**Date:** 2026-05-27  
+**Status:** proposed  
+**Level:** L1  
+**Carries forward:** `bicameral-daemon` ADR-0003 plus the original `bicameral-bot` local grounding ADR
+
+## Problem
+
+The open-core split must not imply that free/public Bicameral is ungrounded. If the local bot only captures notes, it fails the product thesis.
+
+At the same time, full cross-branch, cross-repo, organization-scale code graph and conflict analysis is expensive and belongs in `bicameral-cloud`, not in every local bot install.
+
+## Decision
+
+`bicameral-bot` includes local code grounding for the current repo/worktree. It may inspect files, diffs, paths, symbols, commits, and PR context to produce `BindingEvidence`, `BindingHint`, and local `ComplianceVerdict` proposals.
+
+`bicameral-cloud` owns hosted code graph and conflict infrastructure:
+
+- cross-branch and cross-repo tree-sitter indexes;
+- shared code graph caches across workspace members;
+- conflict gate / conflict oracle;
+- blast-radius and dependency analysis across repositories;
+- expensive or historical grounding optimization.
+
+Cloud returns evidence, hints, advisories, and `GovernanceResult` proposals. It does not become canonical authority; bot governance and the selected event store substrate still decide what materializes.
+
+## Local Bot Owns
+
+- current-worktree grounding: files, line ranges, symbols, imports/callers/callees when a local index exists, current diff/branch context, commit metadata, tests, deploy/release files;
+- local preflight before an agent edits code;
+- local compliance proposals such as `reflected`, `partial`, `drifted`, `pending`, or `ungrounded`;
+- routing weak evidence to review instead of silently approving it.
+
+## Cloud Owns
+
+Cloud may build and cache per-branch/per-repo graphs keyed by `(repo_ref, branch_name, pinned_commit)`, including imports, call-sites, type relationships, deploy surfaces, and cross-repo dependencies.
+
+Cloud may produce substrate-neutral `GovernanceResult` records:
+
+- `severity: info | warning | blocking`
+- `enforcement_capability: ci_block | dashboard_flag | agent_warning | slack_notification | queued_action | none`
+- conflict type: decision conflict, implementation conflict, dependency conflict, compliance conflict.
+
+For git-backed workspaces, review-resolved blocking results can materialize as CI failures if the repository has that enforcement boundary. For non-git substrates, the same result must surface through honest capabilities such as dashboard flags or agent warnings.
+
+## Conflict Oracle
+
+Cloud may proactively ask: "If this proposed L2 decision were grounded, what code paths would it likely touch, and what approved decisions might conflict?"
+
+Those predictions are advisory until reviewed.
+
+## HITL Boundary
+
+Local and cloud grounding both preserve the separate confidence surfaces from ADR-0004:
+
+- extraction confidence;
+- binding confidence;
+- compliance confidence.
+
+High binding confidence does not approve product meaning. High extraction confidence does not make a weak code binding safe to block on. Blocking requires governance policy plus review-resolved evidence.
+
+## Non-Goals
+
+Local grounding does not silently approve compliance or block work. Cloud graph intelligence does not replace local event-store authority.
+
+## Consequences
+
+Free/public Bicameral is useful as a developer tool because it can ground in the current workspace. Paid value concentrates in scale, precision, history, and cross-branch/cross-repo analysis. The same `BindingEvidence`, `ComplianceVerdict`, and `GovernanceResult` vocabulary works for both local and cloud sources.

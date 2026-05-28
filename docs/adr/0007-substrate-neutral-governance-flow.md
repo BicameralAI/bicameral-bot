@@ -1,0 +1,281 @@
+# ADR-0007: Substrate-Neutral Governance Flow
+
+> Carries forward `bicameral-daemon` ADR-0007 as the central bot-owned governance path.
+
+**Date:** 2026-05-27
+**Status:** proposed
+**Level:** L1
+**Related:** ADR-0001, ADR-0002, ADR-0003, ADR-0004, ADR-0005, ADR-0006
+
+## Problem
+
+The same governance path was being re-described across the event store, MCP/bot boundary, hosted code graph, HITL, event-store/policy, and UI ADRs. That makes the architecture look more coupled to a specific substrate or UI than it is, and it creates drift risk: each ADR can accidentally define a slightly different route from source evidence to canonical decision state.
+
+Bicameral needs one generic governance flow that works across different integration choices:
+
+- Git-backed workspaces with PR review and CI enforcement.
+- Google Drive-backed workspaces with file sync, stale/offline states, and dashboard/agent warnings.
+- Dashboard review, Slack modal review, CLI/TUI review, PR review, or batch review.
+- owner/member-authored mods that customize extraction/routing without gaining authority over canonical state.
+- Connectors for Notion, Slack, Linear, email, documents, MCP sessions, support inboxes, or future sources.
+
+The flow must state which parts are core invariants and which parts are safe extension points.
+
+## Decision
+
+Define a **substrate-neutral governance flow** as the only path from source evidence to canonical decision state. Every connector, mod, review surface, and event store substrate maps into this flow. ADR-0001 defines where accepted events are stored; ADR-0007 defines how a candidate becomes eligible to be stored.
+
+```text
+1. Evidence Capture
+   source connector, agent session, manual entry, or mod emits SourceEvidence
+        ↓
+2. Candidate Projection
+   extractor/mod creates DecisionCandidate, BindingHint, DependencySignal, or advisory GovernanceResult
+        ↓
+3. Policy Evaluation
+   governance policy validates schema, provenance, source trust, freshness,
+   permissions, decision level, evidence strength, collisions, and substrate capability
+        ↓
+4. Review Command Gating
+   a review surface shows only commands allowed by policy/state/capability
+   and emits a substrate-neutral ReviewCommand
+        ↓
+5. Review Event Resolution
+   policy converts accepted ReviewCommand into ReviewEvent / GovernanceResult
+   while preserving separate extraction, signoff, grounding, and compliance axes
+        ↓
+6. Materialization
+   event store adapter persists accepted domain events in the selected event store substrate
+        ↓
+7. Enforcement / Notification
+   adapter translates GovernanceResult into CI block, PR warning, dashboard flag,
+   agent warning, Slack notification, queued action, paused approval, or no-op
+```
+
+Canonical decision state changes only after:
+
+1. governance policy accepts the command;
+2. the selected event store adapter successfully materializes the accepted domain event; and
+3. replay from the selected event store substrate produces the new state.
+
+UI surfaces, Slack actions, CLI commands, PR comments, connectors, and mods are command/evidence producers. They are not canonical authorities.
+
+## Core-Owned Invariants
+
+These parts are not customizable by individual integrations or mods.
+
+### 1. Domain vocabulary
+
+The core domain vocabulary is shared across substrates:
+
+- `SourceEvidence`
+- `DecisionCandidate`
+- `Decision`
+- `ReviewCommand`
+- `ReviewEvent`
+- `ReviewState`
+- `BindingHint`
+- `BindingEvidence`
+- `DependencySignal`
+- `ComplianceVerdict`
+- `GovernanceResult`
+
+Connectors and mods may add metadata, but they must map back to these objects before entering policy evaluation.
+
+### 2. Authority separation
+
+- Extraction can propose a `DecisionCandidate`; it cannot approve decision meaning.
+- Owner/member review owns signoff according to workspace governance policy.
+- Code graph/grounding owns `BindingEvidence`; source connectors can only provide hints.
+- Compliance/drift analysis owns `ComplianceVerdict`; weak or unreviewed verdicts remain advisory.
+- Event store adapters own durable materialization.
+- No connector, mod, review surface, or MCP tool directly mutates event store internals.
+
+### 3. Independent state axes
+
+The system must not collapse these into one confidence score:
+
+- extraction confidence / candidate quality;
+- signoff state;
+- grounding/binding confidence;
+- compliance/drift state;
+- source freshness/provenance;
+- substrate enforcement capability.
+
+A strong value on one axis cannot compensate for weakness on another. For example, high extraction confidence does not make a weak code binding safe to block on.
+
+### 4. Replayability
+
+Every canonical state must be rebuildable from the selected event store substrate. SurrealDB, dashboard stores, search indexes, and hosted code graph state are caches/materializations, not authority.
+
+### 5. Allowed-command gating
+
+Review surfaces can only show or emit commands allowed by current governance state, owner/member capability or reviewer assignment, source freshness, evidence strength, and substrate capability.
+
+### 6. Honest enforcement
+
+A `GovernanceResult` must not claim stronger enforcement than the selected substrate can provide. Git can block merges through CI. Google Drive cannot; it can warn, pause, queue, or require review.
+
+## Customizable Parts
+
+These parts are intentionally configurable by workspace, source integration, event store substrate, or owner/member-authored mod.
+
+| Flow stage | Customizable | Not customizable |
+|---|---|---|
+| Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers | provenance must be recorded; secrets must not be persisted as canonical content |
+| Candidate Projection | extraction prompts/rules, labels, feature hints, owner lens, suggested reviewers, domain metadata | outputs remain candidates/hints/signals until policy accepts them |
+| Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, or substrate capability checks |
+| Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics |
+| Materialization | git YAML/commits, Drive YAML/event files, future adapter layouts | replayed domain state must match the shared lifecycle |
+| Enforcement / Notification | CI block, dashboard flag, agent warning, Slack notification, queued local action, paused approval | enforcement must accurately reflect substrate capabilities |
+
+## Standard Review Commands
+
+Initial command vocabulary:
+
+- `accept_candidate`
+- `approve_signoff`
+- `reject_signoff`
+- `reject_candidate`
+- `edit_candidate`
+- `request_context`
+- `assign_reviewer`
+- `bind_to_code`
+- `resolve_compliance`
+- `supersede_decision`
+- `mark_different_scopes`
+- `untrack_source`
+- `pause_approval`
+- `resume_approval`
+
+Commands are substrate-neutral. `accept_candidate` means the extracted candidate is valid enough to become a Decision Ledger record with `signoff.state = proposed`; it does not approve signoff. `reject_candidate` means the extracted claim is not a valid Decision and records review/audit history without creating a Decision by default. `approve_signoff` means the workspace policy permits the actor/action to move ownership signoff to `approved`. `reject_signoff` means an existing proposed Decision is explicitly rejected and remains inspectable in the Decision Ledger with `signoff.state = rejected`. `resolve_compliance` means grounding, binding, or drift evidence has been reviewed enough to resolve the compliance state. The event store adapter decides whether an accepted command becomes a git commit, Drive file write, queued local event awaiting durable sync, or another substrate-specific artifact. Canonical lifecycle changes must still replay from the selected event store substrate; dashboard-only annotations remain non-canonical.
+
+Adding new commands requires updating this ADR or a successor ADR. Mods may not mint private commands that bypass governance policy. A review surface may submit a batch of domain commands for one UX action, but replay must preserve each command as a separate lifecycle transition in `applied_commands`.
+
+## Standard Governance Result
+
+`GovernanceResult` must include at least:
+
+```ts
+type GovernanceResult = {
+  severity: 'blocking' | 'warning' | 'info';
+  review_state:
+    | 'advisory'
+    | 'proposed'
+    | 'needs_signoff_review'
+    | 'needs_grounding_review'
+    | 'needs_compliance_review'
+    | 'collision_pending'
+    | 'stale_source_pending'
+    | 'ready_to_materialize'
+    | 'materialized';
+  evidence_strength: 'weak' | 'reviewed' | 'resolved';
+  enforcement_capability:
+    | 'ci_block'
+    | 'pr_warning'
+    | 'dashboard_flag'
+    | 'agent_warning'
+    | 'slack_notification'
+    | 'queued_action'
+    | 'paused_approval'
+    | 'none';
+  source_refs: string[];
+  allowed_commands: ReviewCommandKind[];
+  applied_commands?: ReviewCommandKind[];
+  reason: string;
+};
+```
+
+## Review State Transitions
+
+Command processing and domain lifecycle are separate. Every accepted command follows the same processing path:
+
+```text
+ReviewCommand
+  → policy accepts/rejects command
+  → accepted domain event is materialized by the selected event store substrate
+  → replay updates Decision Ledger / review state / signoff state / compliance state
+```
+
+Candidate intake has two outcomes:
+
+```text
+SourceEvidence
+  → DecisionCandidate
+  → reject_candidate
+  → rejected candidate review event only; no Decision Ledger record by default
+
+SourceEvidence
+  → DecisionCandidate
+  → accept_candidate
+  → Decision Ledger record with signoff.state = proposed
+```
+
+Once a Decision exists, signoff and compliance advance independently:
+
+```text
+Decision(signoff.state = proposed)
+  → approve_signoff | reject_signoff | supersede_decision | collision_pending | stale_source_pending
+  → signoff.state = approved | rejected | superseded | proposed/pending-review
+
+Decision + BindingEvidence/ComplianceEvidence
+  → bind_to_code | resolve_compliance | request_context
+  → ComplianceVerdict = reflected | partial | drifted | pending | ungrounded
+```
+
+A substrate may add intermediate operational states, such as `branch_pending`, `drive_sync_pending`, or `queued_local_write`, but those states must replay back into the shared lifecycle above.
+
+## Integration Examples
+
+### Git-backed workspace
+
+1. GitHub issue, PR comment, MCP session, or manual entry emits `SourceEvidence`.
+2. Extractor creates a `DecisionCandidate` with source refs and level hint.
+3. Policy checks source trust, branch context, collisions, and reviewer requirements.
+4. Review happens through PR review, dashboard, Slack, or CLI; the surface emits `accept_candidate`, `reject_candidate`, `approve_signoff`, `reject_signoff`, `edit_candidate`, `mark_different_scopes`, etc.
+5. Git adapter materializes accepted candidates as proposed Decisions in `.bicameral/` YAML changes and/or review commits.
+6. Review-resolved blocking results can become CI failures because git has a merge boundary.
+7. Replay from git reconstructs canonical decisions and review state.
+
+### Google Drive-backed workspace
+
+1. Meeting transcript, Drive doc, Slack thread, or manual entry emits `SourceEvidence`.
+2. Extractor creates a `DecisionCandidate` with source refs and freshness metadata.
+3. Policy checks source trust, Drive auth/sync freshness, duplicate candidates, and reviewer requirements.
+4. Review happens through dashboard, Slack, CLI/TUI, or Drive-aware batch review; review surfaces emit the same `accept_candidate`, `reject_candidate`, `approve_signoff`, and `reject_signoff` commands.
+5. If Drive is stale/offline, policy may allow local draft review but emits `stale_source_pending` / `paused_approval` until shared state is fresh.
+6. Drive adapter materializes accepted candidates as proposed Decisions in YAML/event files in the configured Drive folder.
+7. Blocking intent becomes dashboard flags, agent warnings, Slack notifications, queued actions, or paused approval; it does not become CI failure.
+8. Replay from Drive files reconstructs canonical decisions and review state.
+
+### owner/member-authored mod
+
+1. Mod reads an allowed source and emits candidate metadata, reviewer suggestions, and dependency/risk signals.
+2. Policy treats those outputs as hints, not authority.
+3. Review surface may display the mod's suggestions and route to the right reviewer.
+4. Canonical materialization still requires accepted review commands and event store adapter replay.
+
+## Consequences
+
+Positive:
+
+- Removes repeated governance-flow prose from the other ADRs.
+- Lets different integration options share one authority model.
+- Makes customization explicit without compromising canonical state.
+- Allows git and Google Drive flows to differ in materialization/enforcement while replaying the same domain lifecycle.
+- Gives owners/members a safe extension surface: extraction, routing, metadata, presentation, and advisory signals.
+
+Tradeoffs:
+
+- Every connector/mod/review surface must map to the shared command/result vocabulary.
+- Event store adapters need clear capability declarations so UI and agents do not over-promise enforcement.
+- New review commands require ADR updates instead of ad hoc per-integration behavior.
+- Generic lifecycle states may feel more abstract than the concrete git/PR path, but that abstraction prevents Git/CI from becoming the product ontology.
+
+## Rejected Alternatives
+
+- **One governance flow per substrate:** rejected because it would duplicate authority semantics and make cross-substrate behavior unpredictable.
+- **Let each review surface define its own commands:** rejected because Slack, dashboard, CLI, and PR review would drift.
+- **Let mods customize canonical writes:** rejected because owner/member-safe mods must stay expressive at the edge and deterministic at the core.
+- **Treat CI as the universal enforcement model:** rejected because Google Drive and other non-git substrates do not have a merge boundary.
+- **Make the Ingestion Gate / Ledger View the flow itself:** rejected because they are the v0 dashboard surfaces from ADR-0006, not the generic governance model. Other review surfaces must enter the same flow.
