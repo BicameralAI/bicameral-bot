@@ -6,54 +6,88 @@
     "README.md",
     "CONTRIBUTING.md",
     "INSTRUCTIONS.md",
+    "CONTEXT.md",
+    "PAMA.md",
+    "skills/factory-skill-manifest.json",
+    "skills/bic/run-aider-factory-orchestrator/SKILL.md",
     "skills/bic/pre-pr-factory-attestation/SKILL.md",
-    "skills/bic/setup-bicameral-factory/SKILL.md",
-    "skills/factory-skill-manifest.json"
+    "charters/factory-orchestrator.md",
+    "charters/feature-agent.md",
+    "charters/review-gate-agent.md",
+    "blueprints/factory-run-contract.md"
   ],
   "context_evidence": {
     "README.md": {
       "source": "agent-declared",
-      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
-      "sha256": "6db81f14b4ca478367c7c449921640dc5fc357960053bc4e4781ebc2b60d8b85"
+      "reason": "Required baseline factory attestation context.",
+      "sha256": "5b4809bd40b01f50deec953536d91815697e66666abce46be88ce583198beb72"
     },
     "CONTRIBUTING.md": {
       "source": "agent-declared",
-      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "reason": "Required baseline factory contribution and PAMA posture context.",
       "sha256": "4ffc8f1cfd2c7708d707e0e5624a73380497f2f1cfe796da8c541d5d76c92fa5"
     },
     "INSTRUCTIONS.md": {
       "source": "agent-declared",
-      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "reason": "Materially shaped product-session setup, copied skill loading, and attestation requirements.",
       "sha256": "13b8273dbc046b2ec940f34e289db3b0a73e6f558a481ee29b95f65a29bd62eb"
     },
-    "skills/bic/pre-pr-factory-attestation/SKILL.md": {
+    "CONTEXT.md": {
       "source": "agent-declared",
-      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
-      "sha256": "56c0c0e0cb1fce20cafbe4f485894a8126a0756debffcf4678e1e0e03ef1aa2e"
+      "reason": "Materially shaped Bicameral factory/product authority vocabulary for this docs change.",
+      "sha256": "2c4f364106ea75b8a742c20bb33b7015e2860af9cfc239164b20c5ca4d78a7b8"
     },
-    "skills/bic/setup-bicameral-factory/SKILL.md": {
+    "PAMA.md": {
       "source": "agent-declared",
-      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
-      "sha256": "43a761819a02f7accfb42a38445996ccc10a78cef52eaf52fb7d2fe63a72fee0"
+      "reason": "Materially shaped authority-boundary and promotion/separation framing.",
+      "sha256": "608b4bf5e33aacfdd882b8adf27c7062cf591bcac8a265724b7d476c9332dfa2"
     },
     "skills/factory-skill-manifest.json": {
       "source": "agent-declared",
-      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "reason": "Verified copied bic:run-aider-factory-orchestrator skill provenance.",
       "sha256": "77715ebe886fc5a05ed9ef9ebcc63545f78f1fc1192acc466b2d31e170f3c84e"
+    },
+    "skills/bic/run-aider-factory-orchestrator/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the factory run plan and execution attempt for the runtime extraction spec.",
+      "sha256": "87ad00e288cbc82b391d8a856e50c79d7e1b9f71986bd680e06b957155466796"
+    },
+    "skills/bic/pre-pr-factory-attestation/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped this product PR attestation.",
+      "sha256": "56c0c0e0cb1fce20cafbe4f485894a8126a0756debffcf4678e1e0e03ef1aa2e"
+    },
+    "charters/factory-orchestrator.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped orchestration authority boundary and evidence expectations.",
+      "sha256": "d86fc75949b88f1d353e447e73c4477b6d76e06b7db7bf90c521db94d9af9f6b"
+    },
+    "charters/feature-agent.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped worker authority boundary for the planned implementation.",
+      "sha256": "697bb046629bf74c00156b297d6aa3594b8d3ee6b4e6bebdc79aedde96515db5"
+    },
+    "charters/review-gate-agent.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped review-gate expectations for the planned implementation.",
+      "sha256": "3964fd9cb691e87eb3a6ea0523fb0db73bfaf37b26b9428e8fbee361de0b66a5"
+    },
+    "blueprints/factory-run-contract.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped factory run artifact and side-effect boundaries.",
+      "sha256": "5d178c44a84060008a3848373cb9b606b3ad8ceb430d0ddbb6534d18c15cc0be"
     }
   },
   "local_setup_divergence": {
     "checked": true,
-    "resolution": "promoted",
-    "factory_pr": "https://github.com/BicameralAI/bicameral-factory/pull/12",
+    "resolution": "none",
     "unresolved_items": [],
-    "notes": "Stale product instructions pointed to legacy .bicameral/factory-skills. Factory setup docs were promoted in PR #12; this product PR records the repo-local instruction update."
+    "notes": "Used copied bic-* skills under .agents/skills verified against the factory manifest. .hermes/ remains untracked local setup and is excluded from the product diff."
   },
   "end_of_session_capture": {
     "run": true,
-    "factory_pr": "https://github.com/BicameralAI/bicameral-factory/pull/12",
-    "notes": "Reusable correction promoted to factory setup docs; no additional factory artifact needed from this product PR."
+    "notes": "No new factory artifact or domain entity promotion required. This PR adds a product-owned runtime extraction plan and removes the superseded ingest RFQ."
   },
   "attested_by": "Hermes Agent",
-  "timestamp": "2026-05-29T09:17:42.288116Z"
+  "timestamp": "2026-05-29T10:17:03.533740Z"
 }
