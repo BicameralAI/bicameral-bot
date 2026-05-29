@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "factory_repo": "BicameralAI/bicameral-factory",
+  "factory_commit": "06ddff7d67c58c12cc0c9fec457cb599f18852a3",
+  "loaded_context": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "INSTRUCTIONS.md",
+    "CONTEXT.md",
+    "skills/pre-pr-factory-attestation.md",
+    "blueprints/factory-attestation.md"
+  ],
+  "context_evidence": {
+    "README.md": {
+      "source": "agent-declared",
+      "reason": "Material factory context for runtime extraction implementation.",
+      "sha256": "5b4809bd40b01f50deec953536d91815697e66666abce46be88ce583198beb72"
+    },
+    "CONTRIBUTING.md": {
+      "source": "agent-declared",
+      "reason": "Material factory context for runtime extraction implementation.",
+      "sha256": "4ffc8f1cfd2c7708d707e0e5624a73380497f2f1cfe796da8c541d5d76c92fa5"
+    },
+    "INSTRUCTIONS.md": {
+      "source": "agent-declared",
+      "reason": "Material factory context for runtime extraction implementation.",
+      "sha256": "13b8273dbc046b2ec940f34e289db3b0a73e6f558a481ee29b95f65a29bd62eb"
+    },
+    "CONTEXT.md": {
+      "source": "agent-declared",
+      "reason": "Material factory context for runtime extraction implementation.",
+      "sha256": "2c4f364106ea75b8a742c20bb33b7015e2860af9cfc239164b20c5ca4d78a7b8"
+    },
+    "skills/pre-pr-factory-attestation.md": {
+      "source": "agent-declared",
+      "reason": "Material factory context for runtime extraction implementation.",
+      "sha256": "26fdabb64f0e228d3cfe25a0f4b6d1b75006cee6c5e96f31bb659003cdd43522"
+    },
+    "blueprints/factory-attestation.md": {
+      "source": "agent-declared",
+      "reason": "Material factory context for runtime extraction implementation.",
+      "sha256": "5daf259c8390f5e99547ae2ef6ff9e6f4783b5a54afb9d5588560d8ff98a534a"
+    }
+  },
+  "task": "Implement zeroclaw-runtime-copy-extraction-v0.1.md \u2014 selective extraction of ZeroClaw runtime into first-party Bicameral crates",
+  "audit_strength": "agent-declared",
+  "attested_by": "Devin (Bicameral Factory Run playbook)",
+  "timestamp": "2026-05-29T10:44:06.345113+00:00",
+  "local_setup_divergence": {
+    "checked": true,
+    "resolution": "none",
+    "notes": "No local setup divergence. Factory context loaded from fresh clone at main."
+  },
+  "end_of_session_capture": {
+    "run": true,
+    "checks_run": [
+      "cargo build",
+      "cargo test --workspace",
+      "cargo clippy --workspace -- -D warnings"
+    ],
+    "checks_passed": true,
+    "factory_artifacts_in_diff": false,
+    "notes": "All checks pass. No factory scratch artifacts in product diff."
+  },
+  "notes": "Factory context was loaded and followed during implementation. Playbook: Bicameral Factory Run. No factory scratch artifacts committed."
+}

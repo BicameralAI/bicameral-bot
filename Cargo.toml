@@ -1,0 +1,71 @@
+[workspace]
+members = [
+    ".",
+    "crates/bicameral-api",
+    "crates/bicameral-config",
+    "crates/bicameral-runtime",
+    "crates/bicameral-gateway",
+    "crates/bicameral-mods",
+    "crates/bicameral-audit",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/BicameralAI/bicameral-bot"
+rust-version = "1.75"
+
+[workspace.dependencies]
+bicameral-api = { path = "crates/bicameral-api", version = "0.1.0" }
+bicameral-config = { path = "crates/bicameral-config", version = "0.1.0" }
+bicameral-runtime = { path = "crates/bicameral-runtime", version = "0.1.0" }
+bicameral-gateway = { path = "crates/bicameral-gateway", version = "0.1.0" }
+bicameral-mods = { path = "crates/bicameral-mods", version = "0.1.0" }
+bicameral-audit = { path = "crates/bicameral-audit", version = "0.1.0" }
+
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+axum = "0.7"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+sha2 = "0.10"
+
+[package]
+name = "bicameral"
+publish = false
+default-run = "bicameral"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Local-first governance runtime for software teams"
+
+[[bin]]
+name = "bicameral"
+path = "src/main.rs"
+
+[dependencies]
+bicameral-api.workspace = true
+bicameral-config.workspace = true
+bicameral-runtime.workspace = true
+bicameral-gateway.workspace = true
+bicameral-mods.workspace = true
+bicameral-audit.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true

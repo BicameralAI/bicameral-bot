@@ -1,0 +1,25 @@
+[package]
+name = "bicameral-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Local daemon, service lifecycle, and governance engine for Bicameral"
+
+[dependencies]
+bicameral-api.workspace = true
+bicameral-config.workspace = true
+bicameral-audit.workspace = true
+bicameral-gateway.workspace = true
+bicameral-mods.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+sha2.workspace = true
