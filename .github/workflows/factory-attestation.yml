@@ -6,7 +6,12 @@ on:
 
 jobs:
   factory-attestation:
-    uses: BicameralAI/bicameral-factory/.github/workflows/factory-attestation.yml@33e602130e2ea1fb813708c923c4860ee1ab6f4e
-    with:
-      attestation_path: .bicameral/factory-attestations
-      factory_ref: 33e602130e2ea1fb813708c923c4860ee1ab6f4e
+    name: bicameral-factory-attestation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate factory attestation
+        run: |
+          python3 scripts/validate-factory-attestation.py .bicameral/factory-attestations
