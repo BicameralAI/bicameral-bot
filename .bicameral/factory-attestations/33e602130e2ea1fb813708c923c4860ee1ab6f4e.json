@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "factory_repo": "BicameralAI/bicameral-factory",
+  "factory_commit": "33e602130e2ea1fb813708c923c4860ee1ab6f4e",
+  "loaded_context": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "blueprints/factory-attestation.md",
+    "skills/pre-pr-factory-attestation.md"
+  ],
+  "context_evidence": {
+    "README.md": {
+      "source": "agent-declared",
+      "reason": "Baseline factory guidance for setting up the attestation gate.",
+      "sha256": "bdb6689b8c765f99bc30b299f548f9601681f5ae462a848e9fcd089af044db79"
+    },
+    "CONTRIBUTING.md": {
+      "source": "agent-declared",
+      "reason": "PAMA contribution and demotion-loop rules for product repo setup.",
+      "sha256": "3e36382a03893bb97d6decc9e671bce5bce71320c8862f8abc24c5e27b80b4cc"
+    },
+    "blueprints/factory-attestation.md": {
+      "source": "agent-declared",
+      "reason": "Attestation gate workflow setup and validation requirements.",
+      "sha256": "5daf259c8390f5e99547ae2ef6ff9e6f4783b5a54afb9d5588560d8ff98a534a"
+    },
+    "skills/pre-pr-factory-attestation.md": {
+      "source": "agent-declared",
+      "reason": "Pre-PR procedure for creating and validating factory attestations.",
+      "sha256": "0047b86ba899a7f3f5471ba02f8e72727d966e7f64b6164116aa27f91622e372"
+    }
+  },
+  "local_setup_divergence": {
+    "checked": true,
+    "resolution": "none",
+    "notes": "No local-only prompts, aliases, MCP servers, editor rules, scripts, or environment assumptions affected this gate setup."
+  },
+  "end_of_session_capture": {
+    "run": true,
+    "factory_pr": null,
+    "notes": "Set up bicameral-bot to use the newly merged factory attestation gate. No additional reusable factory artifact discovered beyond the pre-PR skill already added to bicameral-factory."
+  },
+  "attested_by": "Hermes Agent",
+  "timestamp": "2026-05-28T00:00:00Z",
+  "target_repo": "BicameralAI/bicameral-bot",
+  "target_branch": "ci/factory-attestation-gate",
+  "agent": "Hermes Agent",
+  "session": "local-cli-session"
+}

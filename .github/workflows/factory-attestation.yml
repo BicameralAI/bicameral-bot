@@ -1,0 +1,12 @@
+name: Bicameral factory attestation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  factory-attestation:
+    uses: BicameralAI/bicameral-factory/.github/workflows/factory-attestation.yml@33e602130e2ea1fb813708c923c4860ee1ab6f4e
+    with:
+      attestation_path: .bicameral/factory-attestations
+      factory_ref: 33e602130e2ea1fb813708c923c4860ee1ab6f4e
