@@ -91,6 +91,8 @@ The important promise is not the exact command spelling. It is the operating mod
 
 **Predictable beats clever.** Canonical decisions should be replayable, reviewable, and auditable. For git-backed workspaces, accepted decisions materialize as text under `.bicameral/decisions/`. Caches, dashboards, and hosted graphs are rebuildable views.
 
+**Survey-informed defaults.** Bicameral's ADRs should be informed by public developer surveys and marketplace evidence, not only internal taste. Current public data points to fragmented decision surfaces (Jira, Confluence, Markdown, Notion, GitHub Discussions, Slack/Teams), strong AI adoption paired with codebase-context/trust concerns, and buyer pressure for security and fast ROI. Git can be the boring default for repo-centric teams while the architecture remains substrate-neutral. Local grounding should be useful before paid cloud; hosted graph intelligence should earn its place through cross-repo, historical, and conflict-analysis value. See [Public Developer Survey Implications](docs/research/public-developer-survey-implications.md).
+
 ## What It Supports
 
 Planned public/local capabilities:

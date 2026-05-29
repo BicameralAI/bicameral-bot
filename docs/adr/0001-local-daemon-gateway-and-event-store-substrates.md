@@ -29,6 +29,12 @@ First-class substrate flows:
 
 ADR-0007 defines the substrate-neutral governance flow: how source evidence, candidates, review commands, policy, and governance results become eligible for materialization. ADR-0001 only defines how accepted domain events are stored, replayed, and exposed by the chosen substrate.
 
+### Survey-informed default
+
+Public developer survey evidence supports git-backed `.bicameral/` text as the default onboarding path for repo-centric engineering teams, but not as the whole Bicameral ontology. Stack Overflow's 2024 survey shows that developer decision evidence is spread across Jira, Confluence, Markdown files, Notion, GitHub Discussions, Azure DevOps, Obsidian, Slack, Teams, Zoom, Discord, and other collaboration surfaces. See [Public Developer Survey Implications](../research/public-developer-survey-implications.md).
+
+Implication: git remains the predictable first-class adapter where teams already use PR/code review as an authority boundary. The architectural invariant is still replayable, auditable accepted events through an event store substrate contract. Drive and future adapters remain real because the source of decision evidence and the source of code are not always the same substrate.
+
 ## Substrate Contract
 
 Every event store substrate must implement the same contract even if its files, review mechanics, and enforcement capabilities differ.
