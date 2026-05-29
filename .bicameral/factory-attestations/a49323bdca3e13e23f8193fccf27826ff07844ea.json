@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "factory_repo": "BicameralAI/bicameral-factory",
+  "factory_commit": "a49323bdca3e13e23f8193fccf27826ff07844ea",
+  "loaded_context": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "INSTRUCTIONS.md",
+    "skills/bic/pre-pr-factory-attestation/SKILL.md",
+    "skills/bic/setup-bicameral-factory/SKILL.md",
+    "skills/factory-skill-manifest.json"
+  ],
+  "context_evidence": {
+    "README.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "sha256": "6db81f14b4ca478367c7c449921640dc5fc357960053bc4e4781ebc2b60d8b85"
+    },
+    "CONTRIBUTING.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "sha256": "4ffc8f1cfd2c7708d707e0e5624a73380497f2f1cfe796da8c541d5d76c92fa5"
+    },
+    "INSTRUCTIONS.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "sha256": "13b8273dbc046b2ec940f34e289db3b0a73e6f558a481ee29b95f65a29bd62eb"
+    },
+    "skills/bic/pre-pr-factory-attestation/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "sha256": "56c0c0e0cb1fce20cafbe4f485894a8126a0756debffcf4678e1e0e03ef1aa2e"
+    },
+    "skills/bic/setup-bicameral-factory/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "sha256": "43a761819a02f7accfb42a38445996ccc10a78cef52eaf52fb7d2fe63a72fee0"
+    },
+    "skills/factory-skill-manifest.json": {
+      "source": "agent-declared",
+      "reason": "Materially shaped the repo-local AGENTS.md instruction update and PR attestation.",
+      "sha256": "77715ebe886fc5a05ed9ef9ebcc63545f78f1fc1192acc466b2d31e170f3c84e"
+    }
+  },
+  "local_setup_divergence": {
+    "checked": true,
+    "resolution": "promoted",
+    "factory_pr": "https://github.com/BicameralAI/bicameral-factory/pull/12",
+    "unresolved_items": [],
+    "notes": "Stale product instructions pointed to legacy .bicameral/factory-skills. Factory setup docs were promoted in PR #12; this product PR records the repo-local instruction update."
+  },
+  "end_of_session_capture": {
+    "run": true,
+    "factory_pr": "https://github.com/BicameralAI/bicameral-factory/pull/12",
+    "notes": "Reusable correction promoted to factory setup docs; no additional factory artifact needed from this product PR."
+  },
+  "attested_by": "Hermes Agent",
+  "timestamp": "2026-05-29T09:17:42.288116Z"
+}
