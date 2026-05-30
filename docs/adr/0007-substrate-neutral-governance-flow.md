@@ -178,6 +178,21 @@ proposed`. Future protocol revisions may rename this command to
 `promote_candidate`, but they must preserve the invariant that all Decision
 creation goes through candidate promotion.
 
+Ingestion Gate `Ingest` is a UI-level batch action over an already-projected
+candidate set for a source item. It is not candidate creation. It emits one or
+more candidate promotion commands for the remaining candidates after the reviewer
+has rejected or edited unwanted candidates. Candidate rejection before ingest is
+a durable `reject_candidate` transition, not a local UI discard. Replay must
+preserve each candidate rejection and promotion as its own lifecycle transition.
+
+A promoted Decision enters `signoff.state = proposed` by default. `proposed` is
+the post-ingest dependency/collision-check staging state: the Decision is now in
+the Ledger and can be compared against existing Decisions, but it is not approved
+until policy and dependency checks resolve. If checks pass and policy permits
+automatic approval, the Decision may transition to `approved`. If checks find a
+conflict, it transitions to `collision_pending`. If checks are unavailable or
+stubbed, it remains `proposed`.
+
 Demotion is a Decision lifecycle operation, not candidate intake. A frontend
 Ledger View may directly initiate demotion commands for existing Decisions, such
 as `reject_signoff`, `supersede_decision`, or a future `demote_decision` /
@@ -245,8 +260,11 @@ SourceEvidence
 
 SourceEvidence
   → DecisionCandidate
-  → accept_candidate / Promote
+  → Ingestion Gate Ingest
+  → accept_candidate / Promote per remaining candidate
   → Decision Ledger record with signoff.state = proposed
+  → dependency/collision check
+  → signoff.state = approved | collision_pending | proposed
 ```
 
 There is no parallel transition from manual UI/CLI input directly to

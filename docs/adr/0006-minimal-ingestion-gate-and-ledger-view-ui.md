@@ -120,13 +120,33 @@ A mod must not:
 - collapse extraction, binding, and compliance into a single confidence score;
 - bypass governance policy.
 
-## Creation and Demotion Rule
+## Ingestion, Creation, and Demotion Rule
 
-The dashboard must not provide a manual "create Decision" path. Any user-entered
-or source-derived decision text starts as a `DecisionCandidate` in the Ingestion
-Gate or another candidate intake surface. A Decision appears in the Decision
-Ledger only after the candidate is promoted by the governed review flow from
-ADR-0007.
+The dashboard must not provide a manual "create Decision" path. The Ingestion
+Gate shows `DecisionCandidate`s that already exist for a selected source item,
+usually produced by a connector, extractor, MCP session, or other candidate
+projection step.
+
+The Ingestion Gate's `Ingest` action is a batch promotion action. The reviewer
+may reject or edit candidates before ingesting. Rejecting a candidate is a
+durable `reject_candidate` action, not a local browser discard. Clicking
+`Ingest` promotes the remaining candidates into the Decision Ledger through the
+governed review flow from ADR-0007. A Decision appears only after that promotion
+path materializes through the selected event store substrate.
+
+Promoted Decisions enter the Ledger with `signoff.state = proposed` by default.
+`proposed` is the dependency/collision-check staging state: the Decision is now
+tracked and comparable against existing Decisions, but it is not approved until
+policy and dependency checks resolve. If checks find no conflict and workspace
+policy allows automatic approval, the Decision may transition to `approved`. If
+checks find a conflict, it transitions to `collision_pending`. If checks are
+unavailable or stubbed, it remains `proposed` and the UI must not present it as
+approved.
+
+The Ingestion Gate should not add a separate manual candidate form in the v0.1
+dashboard. Manual candidate creation can be introduced later as a source/input
+workflow, but it must still produce `DecisionCandidate`s first and must not skip
+the Ingestion Gate promotion boundary.
 
 The Ledger View may provide direct demotion actions for existing Decisions, such
 as reject, supersede, remove, or equivalent authority-lowering commands. Those
@@ -222,7 +242,8 @@ type DecisionCommandKind =
 ADR-0007 owns the canonical governance flow. This ADR only defines how the two-page UI participates in that flow:
 
 - Ingestion Gate is the review surface for source evidence and non-canonical candidate intake.
-- `accept_candidate` / Promote moves a valid candidate into the Decision Ledger as a Decision with `signoff.state = proposed`. `reject_candidate` records a rejected candidate review event without creating a Decision by default. Separate signoff actions use `approve_signoff` or `reject_signoff`.
+- `Ingest` applies candidate promotion to the remaining candidates for a selected source item. Under the ADR-0007 command model, that means one or more accepted candidate promotion commands, each producing a Decision with `signoff.state = proposed` when materialized. Rejected candidates record durable review history without creating Decisions by default. Separate signoff actions use `approve_signoff` or `reject_signoff`.
+- After promotion, dependency/collision checks may transition a proposed Decision to `approved` or `collision_pending` according to workspace policy. Stubbed or unavailable checks leave the Decision proposed.
 - Ledger View is the review surface for Decision Ledger state, plus queued candidate review items when a decision context is needed for comparison. Candidate-only commands apply to `LedgerCandidate`; Decision lifecycle commands apply to `LedgerDecision`.
 - Both pages emit substrate-neutral commands; neither page writes event-store-specific internals directly.
 - Custom source/mod behavior may change extraction, routing, owner lens, and suggested reviewers, but cannot bypass the ADR-0007 authority path.
@@ -240,6 +261,7 @@ Optional supporting controls such as member invites, settings, source configurat
 
 - The spike references `/Users/jinhongkuan/github/bicameral/site/src/routes/mockup` as the UI reference.
 - The Ingestion Gate includes source excerpts, extracted candidates, source-to-candidate highlighting, and an ingest action.
+- The `Ingest` action promotes the remaining candidate set for a source item; it is not a manual candidate creation form.
 - The Ledger View preserves the mockup's hierarchy: feature → decision → child decision → code region.
 - The Ledger View exposes both `signoff` and `compliance` as independent state axes.
 - Collision-pending decisions lock approval until an explicit resolution command is chosen.
