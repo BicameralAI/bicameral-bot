@@ -6,7 +6,7 @@
 
 use bicameral_audit::store::AuditStore;
 use bicameral_config::{BicameralConfig, BicameralPaths};
-use bicameral_gateway::{AppState, serve};
+use bicameral_gateway::{serve, AppState};
 use tokio::sync::watch;
 
 /// Why the daemon's main loop exited.
@@ -72,7 +72,7 @@ pub async fn run(daemon_config: DaemonConfig) -> anyhow::Result<DaemonExit> {
 async fn wait_for_exit_signal() -> anyhow::Result<DaemonExit> {
     #[cfg(unix)]
     {
-        use tokio::signal::unix::{SignalKind, signal};
+        use tokio::signal::unix::{signal, SignalKind};
 
         let mut sigint = signal(SignalKind::interrupt())?;
         let mut sigterm = signal(SignalKind::terminate())?;

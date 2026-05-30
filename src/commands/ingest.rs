@@ -14,24 +14,15 @@ pub async fn run(file: &Path, workspace: Option<&Path>) -> anyhow::Result<()> {
     let content = std::fs::read_to_string(file)?;
     let input: serde_json::Value = serde_json::from_str(&content)?;
 
-    let title = input["title"]
-        .as_str()
-        .unwrap_or("Untitled")
-        .to_string();
-    let description = input["description"]
-        .as_str()
-        .unwrap_or("")
-        .to_string();
+    let title = input["title"].as_str().unwrap_or("Untitled").to_string();
+    let description = input["description"].as_str().unwrap_or("").to_string();
     let level = match input["level"].as_str() {
         Some("product") => DecisionLevel::Product,
         Some("architecture") => DecisionLevel::Architecture,
         Some("implementation") => DecisionLevel::Implementation,
         _ => DecisionLevel::Implementation,
     };
-    let source = input["source"]
-        .as_str()
-        .unwrap_or("cli-ingest")
-        .to_string();
+    let source = input["source"].as_str().unwrap_or("cli-ingest").to_string();
 
     let candidate = DecisionCandidate::new(title.clone(), description, level, source);
 

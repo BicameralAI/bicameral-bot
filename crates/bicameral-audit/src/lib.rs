@@ -11,5 +11,5 @@
 pub mod receipt;
 pub mod store;
 
-pub use receipt::{AuditReceipt, AuditAction};
+pub use receipt::{AuditAction, AuditReceipt};
 pub use store::AuditStore;

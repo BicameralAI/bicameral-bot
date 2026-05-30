@@ -104,7 +104,9 @@ fn install_systemd(binary_path: &Path) -> anyhow::Result<()> {
         .args(["--user", "daemon-reload"])
         .status()?;
 
-    tracing::info!("Systemd user unit installed. Enable with: systemctl --user enable --now bicameral");
+    tracing::info!(
+        "Systemd user unit installed. Enable with: systemctl --user enable --now bicameral"
+    );
     Ok(())
 }
 

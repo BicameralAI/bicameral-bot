@@ -15,7 +15,10 @@ pub async fn validate(manifest_path: &Path) -> anyhow::Result<()> {
         for err in &errors {
             println!("    - {}", err);
         }
-        anyhow::bail!("Mod manifest validation failed with {} error(s)", errors.len());
+        anyhow::bail!(
+            "Mod manifest validation failed with {} error(s)",
+            errors.len()
+        );
     }
 
     Ok(())

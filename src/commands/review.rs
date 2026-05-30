@@ -25,7 +25,10 @@ pub async fn list(workspace: Option<&Path>) -> anyhow::Result<()> {
             if let Ok(candidate) =
                 serde_json::from_str::<bicameral_api::candidate::DecisionCandidate>(&content)
             {
-                println!("  {} — {} [{:?}]", candidate.id, candidate.title, candidate.level);
+                println!(
+                    "  {} — {} [{:?}]",
+                    candidate.id, candidate.title, candidate.level
+                );
                 count += 1;
             }
         }

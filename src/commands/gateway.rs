@@ -1,5 +1,5 @@
 use bicameral_config::WorkspaceDiscovery;
-use bicameral_runtime::daemon::{DaemonConfig, run as run_daemon};
+use bicameral_runtime::daemon::{run as run_daemon, DaemonConfig};
 use std::path::Path;
 
 pub async fn start(workspace: Option<&Path>) -> anyhow::Result<()> {

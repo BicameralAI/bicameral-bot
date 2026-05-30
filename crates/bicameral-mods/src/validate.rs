@@ -49,7 +49,9 @@ pub fn validate_manifest(manifest: &ModManifest) -> Vec<ValidationError> {
 }
 
 /// Load and validate a manifest from a YAML file.
-pub fn load_and_validate(path: &std::path::Path) -> anyhow::Result<(ModManifest, Vec<ValidationError>)> {
+pub fn load_and_validate(
+    path: &std::path::Path,
+) -> anyhow::Result<(ModManifest, Vec<ValidationError>)> {
     let content = std::fs::read_to_string(path)?;
     let manifest: ModManifest = serde_yaml::from_str(&content)?;
     let errors = validate_manifest(&manifest);

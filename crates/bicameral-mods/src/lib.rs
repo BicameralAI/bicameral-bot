@@ -13,6 +13,6 @@ pub mod manifest;
 pub mod runner;
 pub mod validate;
 
-pub use manifest::{ModManifest, ModTrigger, ModAction};
+pub use manifest::{ModAction, ModManifest, ModTrigger};
 pub use runner::FixtureRunner;
 pub use validate::validate_manifest;

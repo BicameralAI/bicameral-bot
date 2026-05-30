@@ -68,10 +68,9 @@ impl EventStoreAdapter for DriveFolderAdapter {
 
         let mut entries = Vec::new();
 
-        let read_dir =
-            std::fs::read_dir(&self.folder_path).map_err(|e| EventStoreError::Io {
-                reason: e.to_string(),
-            })?;
+        let read_dir = std::fs::read_dir(&self.folder_path).map_err(|e| EventStoreError::Io {
+            reason: e.to_string(),
+        })?;
 
         for dir_entry in read_dir {
             let dir_entry = dir_entry.map_err(|e| EventStoreError::Io {

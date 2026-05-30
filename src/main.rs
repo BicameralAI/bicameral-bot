@@ -129,9 +129,7 @@ async fn main() -> anyhow::Result<()> {
         },
         Commands::Mod { action } => match action {
             ModAction::Validate { manifest } => commands::mods::validate(&manifest).await,
-            ModAction::Run { manifest, fixture } => {
-                commands::mods::run(&manifest, &fixture).await
-            }
+            ModAction::Run { manifest, fixture } => commands::mods::run(&manifest, &fixture).await,
         },
         Commands::Gateway { action } => match action {
             GatewayAction::Start => commands::gateway::start(cli.workspace.as_deref()).await,

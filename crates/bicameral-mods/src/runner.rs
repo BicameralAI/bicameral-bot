@@ -1,6 +1,6 @@
 //! Fixture runner for testing mods against sample inputs.
 
-use crate::manifest::{ModManifest, ModAction, TriggerEvent};
+use crate::manifest::{ModAction, ModManifest, TriggerEvent};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -31,7 +31,10 @@ impl FixtureRunner {
         let event_type = fixture
             .get("event_type")
             .and_then(|v| v.as_str())
-            .and_then(|s| serde_json::from_value::<TriggerEvent>(serde_json::Value::String(s.to_string())).ok());
+            .and_then(|s| {
+                serde_json::from_value::<TriggerEvent>(serde_json::Value::String(s.to_string()))
+                    .ok()
+            });
 
         let mut triggered = false;
         let mut actions_fired = Vec::new();
@@ -59,10 +62,7 @@ impl FixtureRunner {
     }
 }
 
-fn filters_match(
-    filters: &[crate::manifest::TriggerFilter],
-    fixture: &serde_json::Value,
-) -> bool {
+fn filters_match(filters: &[crate::manifest::TriggerFilter], fixture: &serde_json::Value) -> bool {
     for filter in filters {
         let value = json_path_get(fixture, &filter.field);
         match value {
@@ -88,18 +88,14 @@ fn filters_match(
                             false
                         }
                     }
-                    FilterOperator::GreaterThan => {
-                        match (v.as_f64(), filter.value.as_f64()) {
-                            (Some(a), Some(b)) => a > b,
-                            _ => false,
-                        }
-                    }
-                    FilterOperator::LessThan => {
-                        match (v.as_f64(), filter.value.as_f64()) {
-                            (Some(a), Some(b)) => a < b,
-                            _ => false,
-                        }
-                    }
+                    FilterOperator::GreaterThan => match (v.as_f64(), filter.value.as_f64()) {
+                        (Some(a), Some(b)) => a > b,
+                        _ => false,
+                    },
+                    FilterOperator::LessThan => match (v.as_f64(), filter.value.as_f64()) {
+                        (Some(a), Some(b)) => a < b,
+                        _ => false,
+                    },
                 };
                 if !matches {
                     return false;

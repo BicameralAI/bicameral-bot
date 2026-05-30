@@ -39,6 +39,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 axum = "0.7"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 sha2 = "0.10"
+libc = "0.2"
 
 [package]
 name = "bicameral"
