@@ -20,6 +20,18 @@ _Avoid_: vague context, model memory
 Reviewable evidence that a decision relates to a code path, symbol, diff, dependency, workflow, or deploy surface.
 _Avoid_: compliance verdict, signoff, status
 
+**GraphSnapshot**:
+The named code snapshot against which local or hosted graph evidence is validated. In git-backed workspaces this is anchored by repository identity, commit SHA, and graph index version; branch names are provenance, not durable identity.
+_Avoid_: branch, latest index, mutable repo graph
+
+**GraphEvidenceState**:
+The evidence state of a graph or symbol claim, such as verified, not found, unknown, ambiguous, unsupported, or approximate candidate. Only verified graph claims can become BindingEvidence or support blocking governance results.
+_Avoid_: ranking score, confidence score, search result
+
+**SymbolOccurrence**:
+A symbol observed at a specific GraphSnapshot with enough path, range, content hash, and parser or resolver evidence to support reviewable grounding.
+_Avoid_: symbol name alone, search hit, stable identity without snapshot
+
 **Decision Ledger**:
 The canonical materialized decision record derived by replaying the selected event store substrate. Durable write authority remains the event store substrate.
 _Avoid_: UI page, hosted cache, dashboard database
