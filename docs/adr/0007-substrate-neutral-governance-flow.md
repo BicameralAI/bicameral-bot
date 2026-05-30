@@ -97,6 +97,9 @@ Connectors and mods may add metadata, but they must map back to these objects be
 ### 2. Authority separation
 
 - Extraction can propose a `DecisionCandidate`; it cannot approve decision meaning.
+- Decision creation is never a manual operation. Frontend, CLI, MCP, connector,
+  and mod surfaces can create or edit candidates; a `Decision` can only appear
+  in the Decision Ledger through the governed candidate promotion path.
 - Owner/member review owns signoff according to workspace governance policy.
 - Code graph/grounding owns `BindingEvidence`; source connectors can only provide hints.
 - Compliance/drift analysis owns `ComplianceVerdict`; weak or unreviewed verdicts remain advisory.
@@ -169,6 +172,20 @@ Initial command vocabulary:
 - `pause_approval`
 - `resume_approval`
 
+`accept_candidate` is the v0.1 Promote command: it promotes a valid
+`DecisionCandidate` into a Decision Ledger record with `signoff.state =
+proposed`. Future protocol revisions may rename this command to
+`promote_candidate`, but they must preserve the invariant that all Decision
+creation goes through candidate promotion.
+
+Demotion is a Decision lifecycle operation, not candidate intake. A frontend
+Ledger View may directly initiate demotion commands for existing Decisions, such
+as `reject_signoff`, `supersede_decision`, or a future `demote_decision` /
+`remove_decision` command. Direct frontend initiation does not mean direct
+storage mutation: the command must still pass through governance policy,
+materialize through the selected event store substrate, and replay into Ledger
+state.
+
 Commands are substrate-neutral. `accept_candidate` means the extracted candidate is valid enough to become a Decision Ledger record with `signoff.state = proposed`; it does not approve signoff. `reject_candidate` means the extracted claim is not a valid Decision and records review/audit history without creating a Decision by default. `approve_signoff` means the workspace policy permits the actor/action to move ownership signoff to `approved`. `reject_signoff` means an existing proposed Decision is explicitly rejected and remains inspectable in the Decision Ledger with `signoff.state = rejected`. `resolve_compliance` means grounding, binding, or drift evidence has been reviewed enough to resolve the compliance state. The event store adapter decides whether an accepted command becomes a git commit, Drive file write, queued local event awaiting durable sync, or another substrate-specific artifact. Canonical lifecycle changes must still replay from the selected event store substrate; dashboard-only annotations remain non-canonical.
 
 Adding new commands requires updating this ADR or a successor ADR. Mods may not mint private commands that bypass governance policy. A review surface may submit a batch of domain commands for one UX action, but replay must preserve each command as a separate lifecycle transition in `applied_commands`.
@@ -228,9 +245,14 @@ SourceEvidence
 
 SourceEvidence
   → DecisionCandidate
-  → accept_candidate
+  → accept_candidate / Promote
   → Decision Ledger record with signoff.state = proposed
 ```
+
+There is no parallel transition from manual UI/CLI input directly to
+`Decision`. Manual input enters as `SourceEvidence` and/or a
+`DecisionCandidate`, then follows the same promotion path as connector,
+integration, MCP, or mod output.
 
 Once a Decision exists, signoff and compliance advance independently:
 

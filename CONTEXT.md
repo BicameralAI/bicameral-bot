@@ -48,6 +48,14 @@ _Avoid_: plugin with arbitrary code authority, policy override, approval script
 The ownership lifecycle on a Decision. Approval is separate from candidate acceptance and separate from code compliance.
 _Avoid_: status, compliance, drift, ratification
 
+**Promote**:
+The governed transition that turns a DecisionCandidate into a Decision Ledger record. All Decision creation must use this lifecycle path; frontend and CLI surfaces must not create Decisions directly.
+_Avoid_: create decision, manual decision, direct ledger insert
+
+**Demote**:
+The governed Ledger View transition that removes, rejects, supersedes, or otherwise lowers a Decision's authority without recreating it as a candidate. Demotion can be initiated directly from the frontend review surface, but still records a review event through governance and the selected event store substrate.
+_Avoid_: delete decision, unapprove, manual removal
+
 **Status / compliance state**:
 The code-compliance state for a decision. It is computed or reviewed from grounding and drift evidence, not hand-authored as signoff.
 _Avoid_: signoff, approval

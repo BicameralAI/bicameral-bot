@@ -120,6 +120,20 @@ A mod must not:
 - collapse extraction, binding, and compliance into a single confidence score;
 - bypass governance policy.
 
+## Creation and Demotion Rule
+
+The dashboard must not provide a manual "create Decision" path. Any user-entered
+or source-derived decision text starts as a `DecisionCandidate` in the Ingestion
+Gate or another candidate intake surface. A Decision appears in the Decision
+Ledger only after the candidate is promoted by the governed review flow from
+ADR-0007.
+
+The Ledger View may provide direct demotion actions for existing Decisions, such
+as reject, supersede, remove, or equivalent authority-lowering commands. Those
+actions are direct in the UI sense: they do not require recreating a candidate.
+They still emit substrate-neutral review commands and materialize through
+governance and the selected event store substrate.
+
 ## Required Data Contracts For The Two Pages
 
 ### Ingestion Gate
@@ -208,7 +222,7 @@ type DecisionCommandKind =
 ADR-0007 owns the canonical governance flow. This ADR only defines how the two-page UI participates in that flow:
 
 - Ingestion Gate is the review surface for source evidence and non-canonical candidate intake.
-- `accept_candidate` moves a valid candidate into the Decision Ledger as a Decision with `signoff.state = proposed`. `reject_candidate` records a rejected candidate review event without creating a Decision by default. Separate signoff actions use `approve_signoff` or `reject_signoff`.
+- `accept_candidate` / Promote moves a valid candidate into the Decision Ledger as a Decision with `signoff.state = proposed`. `reject_candidate` records a rejected candidate review event without creating a Decision by default. Separate signoff actions use `approve_signoff` or `reject_signoff`.
 - Ledger View is the review surface for Decision Ledger state, plus queued candidate review items when a decision context is needed for comparison. Candidate-only commands apply to `LedgerCandidate`; Decision lifecycle commands apply to `LedgerDecision`.
 - Both pages emit substrate-neutral commands; neither page writes event-store-specific internals directly.
 - Custom source/mod behavior may change extraction, routing, owner lens, and suggested reviewers, but cannot bypass the ADR-0007 authority path.
@@ -230,6 +244,8 @@ Optional supporting controls such as member invites, settings, source configurat
 - The Ledger View exposes both `signoff` and `compliance` as independent state axes.
 - Collision-pending decisions lock approval until an explicit resolution command is chosen.
 - Agent-discovered gaps are visually distinct from approved decisions.
+- Manual Decision creation is not available in the dashboard; all Decision creation goes through candidate promotion.
+- Ledger demotion actions may be initiated directly from Ledger View, but must emit review commands rather than writing event-store internals.
 - Mods can only feed the Ingestion Gate / candidate pipeline; canonical writes happen through governance and event store adapters.
 - The spike does not introduce additional top-level product pages beyond Ingestion Gate and Ledger View.
 
