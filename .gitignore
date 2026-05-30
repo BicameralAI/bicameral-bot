@@ -1,0 +1,21 @@
+# Build artifacts
+/target/
+**/*.rs.bk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Bicameral local-only
+.bicameral/factory-context.local.json
+
+# Agent scratch (do not commit)
+.agents/
+.bicameral/factory-skills/
+RUN_SUMMARY.md
