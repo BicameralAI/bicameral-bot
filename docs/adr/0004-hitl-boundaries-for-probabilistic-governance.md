@@ -31,10 +31,8 @@ grounding, and compliance separate, and route ambiguity to the right owner/membe
 
 This boundary is also a human-centered governance boundary. Bicameral should
 improve shared judgment without hiding responsibility behind automated output.
-This follows the values articulated in
-[Magnifica Humanitas](https://www.vatican.va/content/leo-xiv/en/encyclicals/documents/20260515-magnifica-humanitas.html):
-human dignity, truthful shared knowledge, accountable use of AI, and effective
-human responsibility for consequential decisions.
+The governing values are human dignity, truthful shared knowledge, accountable
+use of AI, and effective human responsibility for consequential decisions.
 
 ### Confidence surfaces
 

@@ -24,10 +24,8 @@ The flow must state which parts are core invariants and which parts are safe ext
 It must also keep the product aligned with human-centered AI governance. AI can
 help teams see evidence, propose candidates, and identify conflicts, but it must
 not obscure who is responsible for durable decisions or convert probability into
-authority. This reflects the concerns in
-[Magnifica Humanitas](https://www.vatican.va/content/leo-xiv/en/encyclicals/documents/20260515-magnifica-humanitas.html)
-about human dignity, truth, the common good, transparency, and accountable AI
-governance.
+authority. The flow should preserve human dignity, truth, the common good,
+transparency, and accountable AI governance.
 
 Public survey evidence supports keeping enforcement capability explicit rather
 than assuming every governance result can become a CI check. Stack Overflow's
