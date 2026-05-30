@@ -36,6 +36,14 @@ _Avoid_: connector logic, model prompt, fixed org-chart role
 A substrate-neutral outcome of governance or conflict analysis. It can express blocking, warning, or informational intent; each substrate maps it to honest enforcement channels.
 _Avoid_: CI result only, dashboard warning only
 
+**EventStoreAdapter**:
+The substrate-specific materialization boundary for accepted governance events. Adapters append and replay canonical event entries for git, drive-folder, in-memory, or future substrates; callers must not bypass them with direct canonical writes.
+_Avoid_: generic persistence helper, cache writer, direct decision writer
+
+**ModManifest**:
+A declarative configuration artifact for EM-safe mods: triggers, filters, and allowed evidence-producing actions. A manifest can shape candidate/routing/advisory behavior, but it cannot approve signoff, resolve compliance, or grant itself new authority.
+_Avoid_: plugin with arbitrary code authority, policy override, approval script
+
 **Signoff**:
 The ownership lifecycle on a Decision. Approval is separate from candidate acceptance and separate from code compliance.
 _Avoid_: status, compliance, drift, ratification
