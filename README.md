@@ -4,6 +4,7 @@
 
 <p align="center">
   Local agent for software teams, optimized for spec alignment and grounded in code.
+  
   Helps teams curate portable org context without vendor lock-in, informed by <a href="https://uor.foundation/">UOR Foundation</a>.
 </p>
 
