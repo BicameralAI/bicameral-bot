@@ -230,8 +230,6 @@ Optional supporting controls such as member invites, settings, source configurat
 - The Ledger View exposes both `signoff` and `compliance` as independent state axes.
 - Collision-pending decisions lock approval until an explicit resolution command is chosen.
 - Agent-discovered gaps are visually distinct from approved decisions.
-- AI-suggested, policy-accepted, and human-reviewed states remain visually
-  distinguishable so reviewers do not mistake automation for human judgment.
 - Mods can only feed the Ingestion Gate / candidate pipeline; canonical writes happen through governance and event store adapters.
 - The spike does not introduce additional top-level product pages beyond Ingestion Gate and Ledger View.
 

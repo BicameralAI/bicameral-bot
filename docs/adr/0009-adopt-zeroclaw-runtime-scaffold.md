@@ -62,8 +62,7 @@ The first extraction must narrow ZeroClaw's generic personal-assistant surface i
 2. Keep `protocol/` as the local source of truth for Bicameral objects: `DecisionCandidate`, `SourceEvidence`, `BindingEvidence`, `ReviewCommand`, `GovernanceResult`, and canonical storage commands.
 3. Remove or disable unrelated channel, hardware, broad memory, and general-assistant affordances from the initial public bot binary.
 4. Replace generic autonomy language with governance language: agents and mods may emit candidates, hints, evidence, review commands, and advisory warnings; they may not directly create canonical authority.
-5. Preserve human-centered governance language in copied runtime surfaces: approval gates, receipts, provider abstractions, and plugin hooks must keep automation subordinate to accountable human judgment.
-6. Preserve ZeroClaw license notices for any copied source and keep attribution visible in `NOTICE` or equivalent release metadata.
+5. Preserve ZeroClaw license notices for any copied source and keep attribution visible in `NOTICE` or equivalent release metadata.
 
 ## Authority Boundary
 
@@ -78,11 +77,6 @@ Governance decides what becomes canonical.
 The imported runtime may help execute, observe, validate, and audit. It may not decide canonical decision state by itself.
 
 Mods, tools, integrations, and agents must not directly write `.bicameral/decisions/*.yaml`, ratify decisions, mark compliance as resolved, or create blocking results without governance policy and required human review.
-
-Generic autonomy affordances should be treated as suspect until mapped to
-Bicameral's accountability model. A runtime feature that can act, remember,
-notify, or enforce on behalf of a team must preserve accountable human judgment
-instead of presenting automation as authority.
 
 ## Consequences
 

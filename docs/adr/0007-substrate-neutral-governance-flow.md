@@ -21,12 +21,6 @@ Bicameral needs one generic governance flow that works across different integrat
 
 The flow must state which parts are core invariants and which parts are safe extension points.
 
-It must also keep the product aligned with human-centered AI governance. AI can
-help teams see evidence, propose candidates, and identify conflicts, but it must
-not obscure who is responsible for durable decisions or convert probability into
-authority. The flow should preserve human dignity, truth, the common good,
-transparency, and accountable AI governance.
-
 Public survey evidence supports keeping enforcement capability explicit rather
 than assuming every governance result can become a CI check. Stack Overflow's
 2024 data shows important decision and coordination work happening in tickets,
@@ -143,11 +137,6 @@ policy changes require explicit accountable review unless workspace policy has
 defined a narrow low-risk automation class. That policy decision must itself be
 reviewable and replayable.
 
-### 8. Responsibility and human impact
-
-Governance policy must make responsibility and human impact legible to reviewers.
-Model confidence is never a substitute for accountable judgment.
-
 ## Customizable Parts
 
 These parts are intentionally configurable by workspace, source integration, event store substrate, or owner/member-authored mod.
@@ -156,7 +145,7 @@ These parts are intentionally configurable by workspace, source integration, eve
 |---|---|---|
 | Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers | provenance must be recorded; secrets must not be persisted as canonical content |
 | Candidate Projection | extraction prompts/rules, labels, feature hints, owner lens, suggested reviewers, domain metadata | outputs remain candidates/hints/signals until policy accepts them |
-| Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, responsibility records, or substrate capability checks |
+| Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, or substrate capability checks |
 | Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics |
 | Materialization | git YAML/commits, Drive YAML/event files, future adapter layouts | replayed domain state must match the shared lifecycle |
 | Enforcement / Notification | CI block, dashboard flag, agent warning, Slack notification, queued local action, paused approval | enforcement must accurately reflect substrate capabilities |

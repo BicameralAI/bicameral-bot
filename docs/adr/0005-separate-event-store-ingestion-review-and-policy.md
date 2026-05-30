@@ -88,8 +88,7 @@ creation, require owner/member review for candidate acceptance and signoff appro
 unless policy explicitly permits low-risk automation, and keep weak
 grounding/compliance advisory until reviewed.
 
-Low-risk automation must remain narrow and inspectable. Automation may assist
-judgment, but it must not launder responsibility.
+Low-risk automation must remain narrow and inspectable.
 
 ### 3. Review UX emits review commands
 
