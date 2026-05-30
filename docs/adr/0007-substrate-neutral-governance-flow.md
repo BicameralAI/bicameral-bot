@@ -39,7 +39,8 @@ Define a **substrate-neutral governance flow** as the only path from source evid
 
 ```text
 1. Evidence Capture
-   source connector, agent session, manual entry, or mod emits SourceEvidence
+   source connector, agent session, manual entry, or mod records Source,
+   SourceSnapshot, and SourceEvidence
         ↓
 2. Candidate Projection
    extractor/mod creates DecisionCandidate, BindingHint, DependencySignal, or advisory GovernanceResult
@@ -81,6 +82,8 @@ These parts are not customizable by individual integrations or mods.
 The core domain vocabulary is shared across substrates:
 
 - `SourceEvidence`
+- `Source`
+- `SourceSnapshot`
 - `DecisionCandidate`
 - `Decision`
 - `ReviewCommand`
@@ -123,6 +126,25 @@ A strong value on one axis cannot compensate for weakness on another. For exampl
 
 Every canonical state must be rebuildable from the selected event store substrate. SurrealDB, dashboard stores, search indexes, and hosted code graph state are caches/materializations, not authority.
 
+Source provenance must remain verifiable after the source system changes or
+disappears. A `Source` records the mutable external object linkage. A
+`SourceSnapshot` records the immutable captured view of that object, identified
+by a UOR-compatible content address over the canonical snapshot representation.
+`SourceEvidence` cites one pointer into a source snapshot, so
+candidates, decisions, bindings, and governance results can be audited without
+relying on the live source system still returning the same content.
+Candidates, decisions, and governance results may cite multiple
+`SourceEvidence` records when a claim depends on multiple source regions or
+multiple sources.
+
+`SourceSnapshot` is not an archival mirror of every external source update.
+Bicameral records a new snapshot when the captured source state affects
+Bicameral internal state: candidate projection, candidate invalidation, review
+evidence, decision provenance, binding/governance evidence, freshness-sensitive
+governance, or collision/dependency analysis. If an external source changes but
+Bicameral does not use that change for governance, review, or materialized
+state, the change does not need to become a snapshot event.
+
 ### 5. Allowed-command gating
 
 Review surfaces can only show or emit commands allowed by current governance state, owner/member capability or reviewer assignment, source freshness, evidence strength, and substrate capability.
@@ -146,7 +168,7 @@ These parts are intentionally configurable by workspace, source integration, eve
 
 | Flow stage | Customizable | Not customizable |
 |---|---|---|
-| Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers | provenance must be recorded; secrets must not be persisted as canonical content |
+| Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers, snapshot representation | source URI, snapshot identity, and evidence pointers must be recorded; secrets must not be persisted as canonical content |
 | Candidate Projection | extraction prompts/rules, labels, feature hints, owner lens, suggested reviewers, domain metadata | outputs remain candidates/hints/signals until policy accepts them |
 | Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, or substrate capability checks |
 | Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics |
@@ -179,7 +201,7 @@ proposed`. Future protocol revisions may rename this command to
 creation goes through candidate promotion.
 
 Ingestion Gate `Ingest` is a UI-level batch action over an already-projected
-candidate set for a source item. It is not candidate creation. It emits one or
+candidate set for a source snapshot. It is not candidate creation. It emits one or
 more candidate promotion commands for the remaining candidates after the reviewer
 has rejected or edited unwanted candidates. Candidate rejection before ingest is
 a durable `reject_candidate` transition, not a local UI discard. Replay must
@@ -253,12 +275,12 @@ ReviewCommand
 Candidate intake has two outcomes:
 
 ```text
-SourceEvidence
+Source + SourceSnapshot + SourceEvidence
   → DecisionCandidate
   → reject_candidate
   → rejected candidate review event only; no Decision Ledger record by default
 
-SourceEvidence
+Source + SourceSnapshot + SourceEvidence
   → DecisionCandidate
   → Ingestion Gate Ingest
   → accept_candidate / Promote per remaining candidate

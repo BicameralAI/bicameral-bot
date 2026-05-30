@@ -49,7 +49,7 @@ Do not introduce separate top-level pages for Approval, Drift, Sources, Dependen
 The Channels mockup already behaves like an ingestion gate:
 
 - Sources are grouped by channel/source type: Fathom, Slack, Linear, MCP sessions.
-- Each source item has a detail pane with transcript/thread/ticket/session excerpts.
+- Each source entry has a detail pane with transcript/thread/ticket/session excerpts.
 - Extracted decisions are shown next to source evidence.
 - Clicking an extracted decision highlights the exact transcript excerpt.
 - Untracked items expose `+ Add decision` and `Ingest →` actions.
@@ -123,16 +123,28 @@ A mod must not:
 ## Ingestion, Creation, and Demotion Rule
 
 The dashboard must not provide a manual "create Decision" path. The Ingestion
-Gate shows `DecisionCandidate`s that already exist for a selected source item,
-usually produced by a connector, extractor, MCP session, or other candidate
-projection step.
+Gate shows `DecisionCandidate`s that already exist for a selected `Source` and
+`SourceSnapshot`, usually produced by a connector, extractor, MCP session, or
+other candidate projection step. A `Source` is the live external object linkage;
+the `SourceSnapshot` is the immutable captured view that preserves what
+Bicameral saw when candidates were extracted.
 
-The Ingestion Gate's `Ingest` action is a batch promotion action. The reviewer
-may reject or edit candidates before ingesting. Rejecting a candidate is a
-durable `reject_candidate` action, not a local browser discard. Clicking
-`Ingest` promotes the remaining candidates into the Decision Ledger through the
-governed review flow from ADR-0007. A Decision appears only after that promotion
-path materializes through the selected event store substrate.
+The Ingestion Gate's `Ingest` action is a batch promotion action over candidates
+for the selected source snapshot. The reviewer may reject or edit candidates
+before ingesting. Rejecting a candidate is a durable `reject_candidate` action,
+not a local browser discard. Clicking `Ingest` promotes the remaining candidates
+into the Decision Ledger through the governed review flow from ADR-0007. A
+Decision appears only after that promotion path materializes through the
+selected event store substrate.
+
+Source provenance must remain verifiable after the source system changes,
+deletes content, or becomes unavailable. The Ingestion Gate therefore must treat
+source snapshots as event-store-backed facts and cite evidence with a pointer
+into those snapshots. SurrealDB, dashboard stores, and source-specific caches may
+materialize those facts for query and display, but they are not authority.
+The Ingestion Gate should not behave like a general external-source archive:
+snapshots are shown when they support candidate, review, decision, binding, or
+governance state.
 
 Promoted Decisions enter the Ledger with `signoff.state = proposed` by default.
 `proposed` is the dependency/collision-check staging state: the Decision is now
@@ -162,27 +174,30 @@ Minimum contract:
 
 ```ts
 type IngestionGateItem = {
-  source_type: 'fathom' | 'slack' | 'linear' | 'mcp' | string;
-  source_ref: string;
+  source: SourceRef;
+  snapshot: SourceSnapshotRef;
   source_title: string;
   source_freshness: 'fresh' | 'stale' | 'offline' | 'unknown';
-  excerpts: SourceExcerpt[];
+  evidence: SourceEvidence[];
   candidates: DecisionCandidatePreview[];
   tracked: boolean;
 };
 
-type SourceExcerpt = {
-  id: string;
-  text: string;
-  speaker?: string;
-  timestamp?: string;
+type SourceRef = {
+  uri: string;
+  source_type: 'fathom' | 'slack' | 'linear' | 'mcp' | string;
+};
+
+type SourceSnapshotRef = {
+  snapshot_addr: string;
+  captured_at: string;
 };
 
 type DecisionCandidatePreview = {
   id?: string;
   summary: string;
   feature_hint?: string;
-  excerpt_id?: string;
+  evidence_refs: string[];
   extraction_confidence?: number;
   conflict_hint?: boolean;
   review_state?: ReviewState;
@@ -242,7 +257,7 @@ type DecisionCommandKind =
 ADR-0007 owns the canonical governance flow. This ADR only defines how the two-page UI participates in that flow:
 
 - Ingestion Gate is the review surface for source evidence and non-canonical candidate intake.
-- `Ingest` applies candidate promotion to the remaining candidates for a selected source item. Under the ADR-0007 command model, that means one or more accepted candidate promotion commands, each producing a Decision with `signoff.state = proposed` when materialized. Rejected candidates record durable review history without creating Decisions by default. Separate signoff actions use `approve_signoff` or `reject_signoff`.
+- `Ingest` applies candidate promotion to the remaining candidates for a selected source snapshot. Under the ADR-0007 command model, that means one or more accepted candidate promotion commands, each producing a Decision with `signoff.state = proposed` when materialized. Rejected candidates record durable review history without creating Decisions by default. Separate signoff actions use `approve_signoff` or `reject_signoff`.
 - After promotion, dependency/collision checks may transition a proposed Decision to `approved` or `collision_pending` according to workspace policy. Stubbed or unavailable checks leave the Decision proposed.
 - Ledger View is the review surface for Decision Ledger state, plus queued candidate review items when a decision context is needed for comparison. Candidate-only commands apply to `LedgerCandidate`; Decision lifecycle commands apply to `LedgerDecision`.
 - Both pages emit substrate-neutral commands; neither page writes event-store-specific internals directly.
@@ -261,7 +276,7 @@ Optional supporting controls such as member invites, settings, source configurat
 
 - The spike references `/Users/jinhongkuan/github/bicameral/site/src/routes/mockup` as the UI reference.
 - The Ingestion Gate includes source excerpts, extracted candidates, source-to-candidate highlighting, and an ingest action.
-- The `Ingest` action promotes the remaining candidate set for a source item; it is not a manual candidate creation form.
+- The `Ingest` action promotes the remaining candidate set for a source snapshot; it is not a manual candidate creation form.
 - The Ledger View preserves the mockup's hierarchy: feature → decision → child decision → code region.
 - The Ledger View exposes both `signoff` and `compliance` as independent state axes.
 - Collision-pending decisions lock approval until an explicit resolution command is chosen.
