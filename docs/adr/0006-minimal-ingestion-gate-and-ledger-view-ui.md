@@ -93,8 +93,6 @@ This implies the Ledger View page must model a decision as a composite of:
 - source evidence;
 - code bindings;
 - conflict relationships;
-- accountable reviewer or policy source;
-- human-impact and reversibility hints when policy requires them;
 - allowed review commands.
 
 The ledger page is not merely a list of YAML files. It is the human review surface for canonical state transitions.
@@ -153,8 +151,6 @@ type DecisionCandidatePreview = {
   excerpt_id?: string;
   extraction_confidence?: number;
   conflict_hint?: boolean;
-  human_impact?: 'low' | 'moderate' | 'high' | 'unknown';
-  reversible?: boolean;
   review_state?: ReviewState;
 };
 ```
@@ -171,10 +167,6 @@ type LedgerCandidate = {
   summary: string;
   feature_hint?: string;
   sources: SourceEvidence[];
-  responsible_actor?: string;
-  policy_reason?: string;
-  human_impact?: 'low' | 'moderate' | 'high' | 'unknown';
-  reversible?: boolean;
   review_state: 'advisory' | 'needs_signoff_review' | 'collision_pending' | 'stale_source_pending';
   allowed_commands: CandidateCommandKind[];
 };
@@ -190,11 +182,6 @@ type LedgerDecision = {
   regions?: CodeRegion[];
   conflicts_with?: string[];
   discovered?: boolean;
-  responsible_actor?: string;
-  policy_reason?: string;
-  last_human_reviewed_at?: string;
-  human_impact?: 'low' | 'moderate' | 'high' | 'unknown';
-  reversible?: boolean;
   allowed_commands: DecisionCommandKind[];
 };
 
@@ -244,8 +231,7 @@ Optional supporting controls such as member invites, settings, source configurat
 - Collision-pending decisions lock approval until an explicit resolution command is chosen.
 - Agent-discovered gaps are visually distinct from approved decisions.
 - AI-suggested, policy-accepted, and human-reviewed states remain visually
-  distinguishable, with enough accountability metadata to explain why an action
-  is allowed.
+  distinguishable so reviewers do not mistake automation for human judgment.
 - Mods can only feed the Ingestion Gate / candidate pipeline; canonical writes happen through governance and event store adapters.
 - The spike does not introduce additional top-level product pages beyond Ingestion Gate and Ledger View.
 

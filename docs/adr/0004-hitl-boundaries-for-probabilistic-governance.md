@@ -108,7 +108,7 @@ blocking, or externally visible governance result:
 - reviewer identity or capability class;
 - materializing event store adapter;
 - actor who accepted, approved, rejected, superseded, or resolved the claim;
-- whether automation was advisory, queued, reversible, or authoritative.
+- whether automation was advisory, queued, or authoritative.
 
 The system must not describe an automated recommendation as a human decision
 until an accountable reviewer or configured low-risk policy has accepted that

@@ -62,7 +62,7 @@ The first extraction must narrow ZeroClaw's generic personal-assistant surface i
 2. Keep `protocol/` as the local source of truth for Bicameral objects: `DecisionCandidate`, `SourceEvidence`, `BindingEvidence`, `ReviewCommand`, `GovernanceResult`, and canonical storage commands.
 3. Remove or disable unrelated channel, hardware, broad memory, and general-assistant affordances from the initial public bot binary.
 4. Replace generic autonomy language with governance language: agents and mods may emit candidates, hints, evidence, review commands, and advisory warnings; they may not directly create canonical authority.
-5. Preserve human-centered governance language in copied runtime surfaces: approval gates, receipts, provider abstractions, and plugin hooks must make responsible actors, policy source, reversibility, and human-impact classification visible when they affect shared team state.
+5. Preserve human-centered governance language in copied runtime surfaces: approval gates, receipts, provider abstractions, and plugin hooks must keep automation subordinate to accountable human judgment.
 6. Preserve ZeroClaw license notices for any copied source and keep attribution visible in `NOTICE` or equivalent release metadata.
 
 ## Authority Boundary
@@ -81,9 +81,8 @@ Mods, tools, integrations, and agents must not directly write `.bicameral/decisi
 
 Generic autonomy affordances should be treated as suspect until mapped to
 Bicameral's accountability model. A runtime feature that can act, remember,
-notify, or enforce on behalf of a team must expose who authorized it, what
-policy allowed it, whether the result is reversible, and what human impact it
-may have.
+notify, or enforce on behalf of a team must preserve accountable human judgment
+instead of presenting automation as authority.
 
 ## Consequences
 
@@ -106,5 +105,4 @@ Negative / risks:
 2. Prototype `bicameral init`, `bicameral ingest`, `bicameral preflight`, `bicameral review`, `bicameral mod validate`, and `bicameral mod run` against fixtures.
 3. Implement the first EM-safe mod path as declarative YAML + fixture runner before allowing arbitrary executable plugins.
 4. Add tests that prove mods cannot directly materialize canonical decisions or blocking governance results.
-5. Add tests or fixtures that prove consequential actions carry responsibility, policy, reversibility, and human-impact metadata.
-6. Revisit this ADR after the first runnable bot spike and either adopt copied first-party crates or remove the submodule.
+5. Revisit this ADR after the first runnable bot spike and either adopt copied first-party crates or remove the submodule.

@@ -134,21 +134,19 @@ Review surfaces can only show or emit commands allowed by current governance sta
 
 A `GovernanceResult` must not claim stronger enforcement than the selected substrate can provide. Git can block merges through CI. Google Drive cannot; it can warn, pause, queue, or require review.
 
-### 7. No opaque irreversible automation
+### 7. No opaque consequential automation
 
-The system must not perform opaque or irreversible automation over shared team
+The system must not perform opaque consequential automation over shared team
 state. Consequential transitions such as `approve_signoff`, `resolve_compliance`
 to blocking, `supersede_decision`, destructive source removal, or governance
 policy changes require explicit accountable review unless workspace policy has
-defined a narrow, reversible, low-risk automation class. That policy decision
-must itself be reviewable and replayable.
+defined a narrow low-risk automation class. That policy decision must itself be
+reviewable and replayable.
 
 ### 8. Responsibility and human impact
 
-Governance policy must preserve enough metadata to explain who or what accepted
-the transition, which policy allowed it, whether the transition is reversible,
-and which people or teams may be affected. Model confidence is never a substitute
-for this responsibility record.
+Governance policy must make responsibility and human impact legible to reviewers.
+Model confidence is never a substitute for accountable judgment.
 
 ## Customizable Parts
 
@@ -158,7 +156,7 @@ These parts are intentionally configurable by workspace, source integration, eve
 |---|---|---|
 | Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers | provenance must be recorded; secrets must not be persisted as canonical content |
 | Candidate Projection | extraction prompts/rules, labels, feature hints, owner lens, suggested reviewers, domain metadata | outputs remain candidates/hints/signals until policy accepts them |
-| Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds, reversibility, human-impact classification | policy cannot skip replayability, authority separation, responsibility records, or substrate capability checks |
+| Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, responsibility records, or substrate capability checks |
 | Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics |
 | Materialization | git YAML/commits, Drive YAML/event files, future adapter layouts | replayed domain state must match the shared lifecycle |
 | Enforcement / Notification | CI block, dashboard flag, agent warning, Slack notification, queued local action, paused approval | enforcement must accurately reflect substrate capabilities |
@@ -193,10 +191,6 @@ Adding new commands requires updating this ADR or a successor ADR. Mods may not 
 ```ts
 type GovernanceResult = {
   severity: 'blocking' | 'warning' | 'info';
-  responsible_actor?: string;
-  policy_ref?: string;
-  human_impact?: 'low' | 'moderate' | 'high' | 'unknown';
-  reversible?: boolean;
   review_state:
     | 'advisory'
     | 'proposed'
