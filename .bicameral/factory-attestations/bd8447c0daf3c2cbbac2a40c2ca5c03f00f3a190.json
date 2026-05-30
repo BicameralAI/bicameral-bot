@@ -68,10 +68,10 @@
   },
   "end_of_session_capture": {
     "run": true,
-    "notes": "The session discovered a reusable CONTEXT.md formatting rule: separate domain entities from formal relationship facts and reserve terminology notes for likely misuse. Promoted to bicameral-factory in PR #18."
+    "notes": "The session discovered a reusable CONTEXT.md formatting rule: separate domain entities from formal relationship facts and reserve terminology notes for likely misuse. Promoted to bicameral-factory in PR #18. Continued grilling resolved source snapshot storage, redaction boundary, freshness gating, ReviewProjection visibility, and SensitivityCheck conflict handling."
   },
   "attested_by": "Codex",
-  "timestamp": "2026-05-30T09:03:07Z",
+  "timestamp": "2026-05-30T09:53:45Z",
   "target_repo": "BicameralAI/bicameral-bot",
   "target_branch": "document-promotion-demotion-workflow",
   "agent": "Codex",

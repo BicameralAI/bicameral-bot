@@ -39,8 +39,10 @@ Define a **substrate-neutral governance flow** as the only path from source evid
 
 ```text
 1. Evidence Capture
-   source connector, agent session, manual entry, or mod records Source,
-   SourceSnapshot, and SourceEvidence
+   source connector, agent session, manual entry, or mod normalizes source
+   content; RedactionAdapter removes or transforms content before SourceSnapshot
+   addressing and persistence; retained content becomes Source, SourceSnapshot,
+   and SourceEvidence
         ↓
 2. Candidate Projection
    extractor/mod creates DecisionCandidate, BindingHint, DependencySignal, or advisory GovernanceResult
@@ -84,6 +86,7 @@ The core domain vocabulary is shared across substrates:
 - `SourceEvidence`
 - `Source`
 - `SourceSnapshot`
+- `RedactionAdapter`
 - `DecisionCandidate`
 - `Decision`
 - `ReviewCommand`
@@ -94,6 +97,8 @@ The core domain vocabulary is shared across substrates:
 - `DependencySignal`
 - `ComplianceVerdict`
 - `GovernanceResult`
+- `ReviewProjection`
+- `SensitivityCheck`
 
 Connectors and mods may add metadata, but they must map back to these objects before entering policy evaluation.
 
@@ -128,14 +133,30 @@ Every canonical state must be rebuildable from the selected event store substrat
 
 Source provenance must remain verifiable after the source system changes or
 disappears. A `Source` records the mutable external object linkage. A
-`SourceSnapshot` records the immutable captured view of that object, identified
-by a UOR-compatible content address over the canonical snapshot representation.
+`SourceSnapshot` records the immutable whole captured view of that object,
+identified by a UOR-compatible content address over the canonical snapshot
+representation. The snapshot may include source-relative version metadata such
+as an `updated_at`, ETag, latest message timestamp, or revision id. Connector
+sync cursors, pagination state, and resume tokens are operational connector
+state, not domain snapshot state.
 `SourceEvidence` cites one pointer into a source snapshot, so
 candidates, decisions, bindings, and governance results can be audited without
 relying on the live source system still returning the same content.
 Candidates, decisions, and governance results may cite multiple
 `SourceEvidence` records when a claim depends on multiple source regions or
 multiple sources.
+`SourceEvidence` must carry both the human/external source linkage and the
+immutable snapshot address. The snapshot address is the verification target; the
+source URI preserves display, review, and freshness comparison context. Replay
+must reject or quarantine evidence when the referenced snapshot's parent Source
+does not match the evidence `source_uri`.
+Evidence pointers are typed so renderers and verifiers do not infer pointer
+semantics from string shape. Initial pointer kinds are `json_pointer`,
+`text_range`, `html_selector`, and `external_fragment`.
+`SourceEvidence.excerpt` is mandatory canonical cited evidence. The snapshot
+address and pointer preserve provenance for implementation tests, ingestion
+validation, and future audit tooling; runtime review surfaces must not require a
+live source-system lookup or expensive connector route to render the evidence.
 
 `SourceSnapshot` is not an archival mirror of every external source update.
 Bicameral records a new snapshot when the captured source state affects
@@ -145,9 +166,33 @@ governance, or collision/dependency analysis. If an external source changes but
 Bicameral does not use that change for governance, review, or materialized
 state, the change does not need to become a snapshot event.
 
+Full source snapshot bodies are stored as content-addressed blobs or refs rather
+than inlined into every domain event. Snapshot events carry `source_uri`,
+`snapshot_addr`, `snapshot_ref`, capture metadata, source version metadata, and
+representation kind. The selected event store substrate decides whether the blob
+is a git file, local CAS object, Drive file, object-store key, or future storage
+artifact. `snapshot_ref` must resolve to bytes whose UOR-compatible content
+address equals `snapshot_addr`.
+
+Redaction is a local adapter boundary before snapshot content addressing and
+persistence. The v0 `RedactionAdapter` may be stubbed, but the pipeline must not
+skip the boundary: unredacted connector payloads are not Bicameral domain state.
+`SourceSnapshot` represents the retained canonical source object after local
+redaction/allowlisting, and its content address is computed over that retained
+representation.
+
 ### 5. Allowed-command gating
 
 Review surfaces can only show or emit commands allowed by current governance state, owner/member capability or reviewer assignment, source freshness, evidence strength, and substrate capability.
+
+Actor-specific escalation visibility is handled by `ReviewProjection`, not by
+dashboard components or peer agents. Governance policy computes canonical review
+state, `GovernanceResult`s, and allowed commands. `ReviewProjection` shapes that
+state for a specific actor and surface: actionable escalations are shown only
+when the actor has at least one allowed command for the result, while
+non-actionable states remain passive contextual badges or blocked-by-review
+messages on affected work. `ReviewProjection` does not create authority; it is a
+read model over replayed/materialized governance state.
 
 ### 6. Honest enforcement
 
@@ -162,16 +207,85 @@ policy changes require explicit accountable review unless workspace policy has
 defined a narrow low-risk automation class. That policy decision must itself be
 reviewable and replayable.
 
+### 8. Freshness and propagation
+
+Freshness is enforced at command gating, not only displayed in review surfaces.
+Governance policy evaluates source freshness from `Source`, `SourceSnapshot`,
+`SourceEvidence`, source trust rules, and source-specific version metadata.
+Freshness-sensitive commands such as `accept_candidate`, `approve_signoff`,
+`resolve_compliance`, or `supersede_decision` may be accepted, rejected, paused,
+or downgraded to advisory state according to policy.
+
+Newer source snapshots do not automatically warn every citing Decision. When a
+new relevant `SourceSnapshot` exists for a cited `Source`, Bicameral queues or
+runs a sensitivity check to decide whether the source change materially affects
+the cited evidence or decision meaning. Only material changes escalate to
+`stale_source_pending` or a needs-review `GovernanceResult`; non-material
+changes do not create decision warnings.
+
+Sensitivity-check disagreement is canonical governance state, not projection-only
+visibility. If independent agents or workers compute conflicting materiality
+results for the same `(source_uri, previous_snapshot_addr, current_snapshot_addr,
+check_kind)`, the system records a `sensitivity_conflict_pending` state or
+equivalent `GovernanceResult`. `ReviewProjection` controls who sees actionable
+escalation, but command gating must be able to observe the conflict from
+replayed/materialized state.
+
+Minimum `SensitivityCheck` contract:
+
+```ts
+type SensitivityCheck = {
+  source_uri: string;
+  previous_snapshot_addr: string;
+  current_snapshot_addr: string;
+  check_kind: 'decision_impact';
+  result: 'non_material' | 'material' | 'unknown';
+  affected_evidence_refs: string[];
+  affected_decision_refs: string[];
+  reason: string;
+};
+```
+
+`SensitivityCheck` writes are idempotent by `(source_uri,
+previous_snapshot_addr, current_snapshot_addr, check_kind)`. A repeated
+compatible result reuses the existing check. A materially different result must
+record or materialize `sensitivity_conflict_pending`; it must not overwrite by
+last writer wins.
+
+The first concrete freshness rule is that `approve_signoff` requires cited
+evidence to be fresh or sensitivity-resolved for each cited `Source`, unless
+workspace governance policy explicitly allows stale approval. Approval gating
+must not perform live network freshness checks against Jira, Slack, Linear, or
+other source systems. It evaluates only source snapshots, sensitivity-check
+results, and projection state Bicameral has already recorded. If material
+staleness is unresolved, policy emits or materializes a `stale_source_pending`
+review state and the approval command does not advance.
+
+Staleness is computed on `SourceEvidence` citations and projected onto the
+objects that cite them. A materially stale citation makes a `DecisionCandidate`
+or proposed `Decision` `stale_source_pending`. A materially stale citation on an
+approved `Decision` emits a warning or needs-review `GovernanceResult`; it does
+not automatically demote or reject the approved Decision.
+
+Event propagation starts with the selected event store substrate. Connectors,
+review surfaces, agents, and mods append commands or evidence through the local
+daemon/gateway boundary. Accepted events are materialized by the
+`EventStoreAdapter`, replay updates canonical/materialized state, and projection
+workers update SurrealDB, dashboard stores, notification queues,
+`ReviewProjection`s, MCP surfaces, or agent advisory views. Agents must not
+propagate canonical state directly to other agents peer-to-peer; they observe
+replayed or materialized state through daemon/gateway surfaces.
+
 ## Customizable Parts
 
 These parts are intentionally configurable by workspace, source integration, event store substrate, or owner/member-authored mod.
 
 | Flow stage | Customizable | Not customizable |
 |---|---|---|
-| Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers, snapshot representation | source URI, snapshot identity, and evidence pointers must be recorded; secrets must not be persisted as canonical content |
+| Evidence Capture | source connector, polling vs webhook, source filters, RedactionAdapter implementation, redaction/pointers, snapshot representation | source URI, snapshot identity, and evidence pointers must be recorded; unredacted connector payloads must not become Bicameral domain state |
 | Candidate Projection | extraction prompts/rules, labels, feature hints, owner lens, suggested reviewers, domain metadata | outputs remain candidates/hints/signals until policy accepts them |
 | Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, or substrate capability checks |
-| Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics |
+| Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation, ReviewProjection presentation grouping | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics or escalation rules outside ReviewProjection |
 | Materialization | git YAML/commits, Drive YAML/event files, future adapter layouts | replayed domain state must match the shared lifecycle |
 | Enforcement / Notification | CI block, dashboard flag, agent warning, Slack notification, queued local action, paused approval | enforcement must accurately reflect substrate capabilities |
 

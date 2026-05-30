@@ -190,7 +190,21 @@ type SourceRef = {
 
 type SourceSnapshotRef = {
   snapshot_addr: string;
+  snapshot_ref: string;
   captured_at: string;
+  source_version?: string;
+};
+
+type SourceEvidence = {
+  source_uri: string;
+  snapshot_addr: string;
+  pointer: SourcePointer;
+  excerpt: string;
+};
+
+type SourcePointer = {
+  kind: 'json_pointer' | 'text_range' | 'html_selector' | 'external_fragment';
+  value: string;
 };
 
 type DecisionCandidatePreview = {

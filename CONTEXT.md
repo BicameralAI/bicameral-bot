@@ -16,7 +16,7 @@ Bicameral captures implementation-constraining decisions from product, code, and
 : Mutable external object linkage identified by URI.
 
 `SourceSnapshot`
-: Immutable captured view of a Source, identified by content address.
+: Immutable whole captured view of a Source, identified by content address.
 
 `SourceEvidence`
 : Pointer into one SourceSnapshot.
@@ -26,6 +26,15 @@ Bicameral captures implementation-constraining decisions from product, code, and
 
 `GovernanceResult`
 : Substrate-neutral outcome of governance or conflict analysis.
+
+`SensitivityCheck`
+: Materiality analysis comparing two SourceSnapshots for whether a source change affects cited evidence or Decision meaning.
+
+`ReviewProjection`
+: Actor-aware read model that shapes canonical governance state into actionable review, passive context, and allowed commands for a dashboard, CLI, MCP, or agent view.
+
+`RedactionAdapter`
+: Local pre-snapshot boundary that removes or transforms source content before content addressing and persistence.
 
 `ModManifest`
 : Declarative configuration artifact for EM-safe evidence-producing mods.
@@ -49,6 +58,8 @@ Bicameral captures implementation-constraining decisions from product, code, and
 `SourceSnapshot` captures `Source` [1].
 
 `Source` has `SourceSnapshot` [0..*].
+
+`SensitivityCheck` compares `SourceSnapshot` to `SourceSnapshot` [1..1].
 
 `Promote` turns `DecisionCandidate` into `Decision` [0..1].
 
