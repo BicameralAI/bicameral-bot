@@ -68,12 +68,12 @@
   },
   "end_of_session_capture": {
     "run": true,
-    "notes": "No new factory artifact or factory-domain entity promotion required. This PR updates product-owned ADRs only and does not create a dedicated ADR."
+    "notes": "The session discovered a reusable CONTEXT.md formatting rule: separate domain entities from formal relationship facts and reserve terminology notes for likely misuse. Promoted to bicameral-factory in PR #18."
   },
   "attested_by": "Codex",
-  "timestamp": "2026-05-30T01:30:44Z",
+  "timestamp": "2026-05-30T09:03:07Z",
   "target_repo": "BicameralAI/bicameral-bot",
-  "target_branch": "align-values",
+  "target_branch": "document-promotion-demotion-workflow",
   "agent": "Codex",
   "session": "local-cli-session"
 }
