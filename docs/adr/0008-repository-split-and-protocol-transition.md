@@ -18,7 +18,7 @@ Use `bicameral-daemon` as private architecture staging and gold-standard documen
 - `bicameral-bot` — public local daemon/gateway/runtime, local code grounding, review UX, storage-adapter materialization, embedded protocol, and EM governance skills.
 - `bicameral-integrations` — public source adapters and EM-safe mods that emit candidates/evidence/signals.
 - `bicameral-mcp` — public agent-facing MCP tools that emit protocol-shaped evidence, queries, and review commands.
-- `bicameral-cloud` — private hosted code graph, conflict oracle, blast-radius analysis, and grounding optimization.
+- `bicameral-cloud` — private hosted code graph, conflict advisory service, blast-radius analysis, and grounding optimization.
 - `bicameral-daemon` — legacy/private architecture staging repo and gold-standard documentation reference until the split repos catch up.
 
 Protocol contracts move into `bicameral-bot/protocol/`.
@@ -35,7 +35,7 @@ The standalone `bicameral-protocol` repo should become a deprecated pointer unle
 
 This ADR does not delete the daemon ADR set. Existing daemon ADRs remain the most complete architecture reference until target repos catch up.
 
-This ADR does not move hosted graph/oracle behavior into the public bot. The bot owns local grounding and runtime authority; cloud owns organization-scale advisory infrastructure.
+This ADR does not move hosted graph or conflict advisory behavior into the public bot. The bot owns local grounding and runtime authority; cloud owns organization-scale advisory infrastructure.
 
 ## Consequences
 

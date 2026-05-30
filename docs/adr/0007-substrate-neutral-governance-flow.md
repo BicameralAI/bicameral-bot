@@ -128,6 +128,15 @@ Review surfaces can only show or emit commands allowed by current governance sta
 
 A `GovernanceResult` must not claim stronger enforcement than the selected substrate can provide. Git can block merges through CI. Google Drive cannot; it can warn, pause, queue, or require review.
 
+### 7. No opaque consequential automation
+
+The system must not perform opaque consequential automation over shared team
+state. Consequential transitions such as `approve_signoff`, `resolve_compliance`
+to blocking, `supersede_decision`, destructive source removal, or governance
+policy changes require explicit accountable review unless workspace policy has
+defined a narrow low-risk automation class. That policy decision must itself be
+reviewable and replayable.
+
 ## Customizable Parts
 
 These parts are intentionally configurable by workspace, source integration, event store substrate, or owner/member-authored mod.

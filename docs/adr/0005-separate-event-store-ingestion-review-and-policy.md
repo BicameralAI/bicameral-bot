@@ -88,6 +88,8 @@ creation, require owner/member review for candidate acceptance and signoff appro
 unless policy explicitly permits low-risk automation, and keep weak
 grounding/compliance advisory until reviewed.
 
+Low-risk automation must remain narrow and inspectable.
+
 ### 3. Review UX emits review commands
 
 Review surfaces must not write directly to event-store-specific internals. PR review,
@@ -164,7 +166,6 @@ Tradeoffs:
 - Requires discipline: connectors must not quietly bypass review policy.
 - Requires governance result semantics that can degrade gracefully when a
   substrate cannot enforce a hard block.
-
 ## Rejected Alternatives
 
 - **Git/CI as the universal model:** rejected because it conflates event authority and

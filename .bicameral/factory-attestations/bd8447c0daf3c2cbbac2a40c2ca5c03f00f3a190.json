@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "factory_repo": "BicameralAI/bicameral-factory",
+  "factory_commit": "bd8447c0daf3c2cbbac2a40c2ca5c03f00f3a190",
+  "loaded_context": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "INSTRUCTIONS.md",
+    "CONTEXT.md",
+    "PAMA.md",
+    "blueprints/factory-attestation.md",
+    "skills/factory-skill-manifest.json",
+    "skills/bic/pre-pr-factory-attestation/SKILL.md",
+    "skills/bic/mattpocock/engineering/grill-with-docs/SKILL.md"
+  ],
+  "context_evidence": {
+    "README.md": {
+      "source": "agent-declared",
+      "reason": "Baseline factory guidance for product work provenance.",
+      "sha256": "5b4809bd40b01f50deec953536d91815697e66666abce46be88ce583198beb72"
+    },
+    "CONTRIBUTING.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped PAMA contribution posture, local setup divergence handling, and end-of-session capture.",
+      "sha256": "4ffc8f1cfd2c7708d707e0e5624a73380497f2f1cfe796da8c541d5d76c92fa5"
+    },
+    "INSTRUCTIONS.md": {
+      "source": "agent-declared",
+      "reason": "Required product-session setup context and factory skill preference rules.",
+      "sha256": "13b8273dbc046b2ec940f34e289db3b0a73e6f558a481ee29b95f65a29bd62eb"
+    },
+    "CONTEXT.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped authority-boundary and Bicameral product vocabulary for the ADR updates.",
+      "sha256": "2c4f364106ea75b8a742c20bb33b7015e2860af9cfc239164b20c5ca4d78a7b8"
+    },
+    "PAMA.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped responsibility, promotion, reversibility, and authority-boundary language.",
+      "sha256": "608b4bf5e33aacfdd882b8adf27c7062cf591bcac8a265724b7d476c9332dfa2"
+    },
+    "blueprints/factory-attestation.md": {
+      "source": "agent-declared",
+      "reason": "Defined the attestation shape and validator requirements used for this PR.",
+      "sha256": "5daf259c8390f5e99547ae2ef6ff9e6f4783b5a54afb9d5588560d8ff98a534a"
+    },
+    "skills/factory-skill-manifest.json": {
+      "source": "agent-declared",
+      "reason": "Used to identify factory-shipped copied skill provenance.",
+      "sha256": "77715ebe886fc5a05ed9ef9ebcc63545f78f1fc1192acc466b2d31e170f3c84e"
+    },
+    "skills/bic/pre-pr-factory-attestation/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Materially shaped creation and validation of this product PR attestation.",
+      "sha256": "56c0c0e0cb1fce20cafbe4f485894a8126a0756debffcf4678e1e0e03ef1aa2e"
+    },
+    "skills/bic/mattpocock/engineering/grill-with-docs/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Lightly shaped the ADR review posture and decision-language alignment pass.",
+      "sha256": "1ece0c6bf0eef08bcb8882c9e945655712da089b65e262ac91b54d3a617ef352"
+    }
+  },
+  "local_setup_divergence": {
+    "checked": true,
+    "resolution": "none",
+    "unresolved_items": [],
+    "notes": "The local factory context file records a49323bdca3e13e23f8193fccf27826ff07844ea, while the actual factory checkout used for this PR is bd8447c0daf3c2cbbac2a40c2ca5c03f00f3a190. This attestation is commit-grounded to the actual checkout. The unrelated untracked .hermes/ directory was left out of the product diff."
+  },
+  "end_of_session_capture": {
+    "run": true,
+    "notes": "No new factory artifact or factory-domain entity promotion required. This PR updates product-owned ADRs only and does not create a dedicated ADR."
+  },
+  "attested_by": "Codex",
+  "timestamp": "2026-05-30T01:30:44Z",
+  "target_repo": "BicameralAI/bicameral-bot",
+  "target_branch": "align-values",
+  "agent": "Codex",
+  "session": "local-cli-session"
+}

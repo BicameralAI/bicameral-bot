@@ -85,7 +85,7 @@ No surface bypasses this path.
 - Canonical audit log.
 - Direct `.bicameral/decisions/*.yaml` writes.
 - Hosted organization-scale code graph.
-- Cross-branch conflict oracle.
+- Cross-branch conflict advisory service.
 - Multi-tenant auth for cloud services.
 - Final authority over signoff or compliance unless governance policy explicitly accepts the submitted review command.
 
