@@ -4,10 +4,10 @@
 
 <p align="center">
   Local agent for software teams, optimized for spec alignment and grounded in code.
-  
-  Helps teams curate portable org context without vendor lock-in, informed by <a href="https://uor.foundation/">UOR Foundation</a>.
 </p>
-
+<p align="center">
+  Assist teams curate portable product context without vendor lock-in (<a href="https://uor.foundation/">UOR Framework</a>).
+</p>
 <p align="center">
   <a href="https://github.com/BicameralAI/bicameral-bot">bot</a>&nbsp; • &nbsp;
   <a href="https://github.com/BicameralAI/bicameral-mcp">mcp</a>&nbsp; • &nbsp;
