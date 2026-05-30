@@ -29,6 +29,13 @@ Treat human-in-the-loop review as a tactical debt-control boundary, not as an
 exception path. The bot runtime and any cloud advisory service must keep the confidence surfaces for extraction,
 grounding, and compliance separate, and route ambiguity to the right owner/member capability or reviewer assignment.
 
+This boundary is also a human-centered governance boundary. Bicameral should
+improve shared judgment without hiding responsibility behind automated output.
+This follows the values articulated in
+[Magnifica Humanitas](https://www.vatican.va/content/leo-xiv/en/encyclicals/documents/20260515-magnifica-humanitas.html):
+human dignity, truthful shared knowledge, accountable use of AI, and effective
+human responsibility for consequential decisions.
+
 ### Confidence surfaces
 
 Every automated governance claim that can affect shared team state must preserve
@@ -95,6 +102,20 @@ When the bot or cloud advisory path escalates or blocks, it must preserve why:
 - confidence surface values or qualitative reasons;
 - reviewer action and resulting state transition.
 
+The audit trail must also preserve the responsibility chain for any accepted,
+blocking, or externally visible governance result:
+
+- extractor/provider identity when available;
+- governance policy version or policy source;
+- reviewer identity or capability class;
+- materializing event store adapter;
+- actor who accepted, approved, rejected, superseded, or resolved the claim;
+- whether automation was advisory, queued, reversible, or authoritative.
+
+The system must not describe an automated recommendation as a human decision
+until an accountable reviewer or configured low-risk policy has accepted that
+transition.
+
 ## Consequences
 
 Positive:
@@ -114,6 +135,8 @@ Tradeoffs:
   advisory until grounding is resolved.
 - Dashboard and protocol surfaces must expose uncertainty honestly instead of
   hiding it behind one score.
+- Accountability metadata must become part of the product surface, which adds
+  schema and UI work but prevents authority from becoming opaque.
 
 ## Relationship to Existing ADRs
 

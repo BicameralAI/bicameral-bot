@@ -71,6 +71,10 @@ Policy should be able to vary by at least:
 - decision level (`L1`, `L2`, `L3`);
 - extraction/binding/compliance confidence;
 - required owner/member capability or reviewer assignment;
+- affected role, team, or stakeholder group;
+- reversibility of the proposed transition;
+- privacy or sensitivity of the source evidence;
+- downstream work disruption or external user impact;
 - desired enforcement behavior.
 
 Common modes:
@@ -87,6 +91,13 @@ Default policy should favor progress without false authority: automate candidate
 creation, require owner/member review for candidate acceptance and signoff approval
 unless policy explicitly permits low-risk automation, and keep weak
 grounding/compliance advisory until reviewed.
+
+Low-risk automation must be narrow, reversible, and inspectable. Workspace policy
+should not auto-accept or auto-approve transitions that materially affect
+employment, access, privacy, customer commitments, external obligations, or
+irreversible shared state unless a separate ADR explicitly defines that boundary.
+This keeps Bicameral aligned with human-centered AI governance: automation may
+assist judgment, but it must not launder responsibility.
 
 ### 3. Review UX emits review commands
 
@@ -117,17 +128,19 @@ This ADR intentionally leaves several product and implementation choices open:
 2. **Automation threshold** — which decision classes can auto-accept candidates
    and/or auto-approve signoff, and which always require owner/member review plus
    any additional policy checks?
-3. **Global vs branch-scoped candidates** — an externally ingested Notion decision
+3. **Human-impact classification** — which transitions count as low-risk,
+   reversible, or materially consequential for affected people and teams?
+4. **Global vs branch-scoped candidates** — an externally ingested Notion decision
    may apply globally, while an agent-discovered implementation gap may belong
    to a feature branch. Policy must decide when a candidate attaches to a branch,
    a global queue, or both.
-4. **Review command ownership** — protocol should define command shapes, but the
+5. **Review command ownership** — protocol should define command shapes, but the
    bot must decide which commands it owns directly vs delegates to MCP clients
    or event store adapters.
-5. **Non-git enforcement semantics** — git-backed workspaces can fail CI. Other
+6. **Non-git enforcement semantics** — git-backed workspaces can fail CI. Other
    substrates need equivalent visibility without pretending they can enforce a
    merge boundary they do not control.
-6. **Review UX product shape** — dashboard, PR review, Slack modal, and CLI/TUI
+7. **Review UX product shape** — dashboard, PR review, Slack modal, and CLI/TUI
    can share commands, but each imposes different latency, batching, and audit
    expectations.
 
@@ -164,6 +177,8 @@ Tradeoffs:
 - Requires discipline: connectors must not quietly bypass review policy.
 - Requires governance result semantics that can degrade gracefully when a
   substrate cannot enforce a hard block.
+- Requires teams to classify human impact and reversibility instead of treating
+  every automation threshold as a model-confidence problem.
 
 ## Rejected Alternatives
 

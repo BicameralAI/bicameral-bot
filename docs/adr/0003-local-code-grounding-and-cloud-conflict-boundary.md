@@ -15,11 +15,11 @@ At the same time, full cross-branch, cross-repo, organization-scale code graph a
 
 `bicameral-bot` includes local code grounding for the current repo/worktree. It may inspect files, diffs, paths, symbols, commits, and PR context to produce `BindingEvidence`, `BindingHint`, and local `ComplianceVerdict` proposals.
 
-`bicameral-cloud` owns hosted code graph and conflict infrastructure:
+`bicameral-cloud` owns hosted code graph and conflict advisory infrastructure:
 
 - cross-branch and cross-repo tree-sitter indexes;
 - shared code graph caches across workspace members;
-- conflict gate / conflict oracle;
+- conflict gate / conflict advisory service;
 - blast-radius and dependency analysis across repositories;
 - expensive or historical grounding optimization.
 
@@ -50,7 +50,7 @@ Cloud may produce substrate-neutral `GovernanceResult` records:
 
 For git-backed workspaces, review-resolved blocking results can materialize as CI failures if the repository has that enforcement boundary. For non-git substrates, the same result must surface through honest capabilities such as dashboard flags or agent warnings.
 
-## Conflict Oracle
+## Conflict Advisory Service
 
 Cloud may proactively ask: "If this proposed L2 decision were grounded, what code paths would it likely touch, and what approved decisions might conflict?"
 
