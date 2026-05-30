@@ -95,6 +95,20 @@ When the bot or cloud advisory path escalates or blocks, it must preserve why:
 - confidence surface values or qualitative reasons;
 - reviewer action and resulting state transition.
 
+The audit trail must also preserve the responsibility chain for any accepted,
+blocking, or externally visible governance result:
+
+- extractor/provider identity when available;
+- governance policy version or policy source;
+- reviewer identity or capability class;
+- materializing event store adapter;
+- actor who accepted, approved, rejected, superseded, or resolved the claim;
+- whether automation was advisory, queued, or authoritative.
+
+The system must not describe an automated recommendation as a human decision
+until an accountable reviewer or configured low-risk policy has accepted that
+transition.
+
 ## Consequences
 
 Positive:
@@ -114,6 +128,8 @@ Tradeoffs:
   advisory until grounding is resolved.
 - Dashboard and protocol surfaces must expose uncertainty honestly instead of
   hiding it behind one score.
+- Audit records must preserve enough responsibility-chain detail to debug
+  accepted, blocking, or externally visible governance results.
 
 ## Relationship to Existing ADRs
 
