@@ -13,8 +13,11 @@ pub struct BicameralPaths {
     pub config_file: PathBuf,
     /// Decisions directory: `.bicameral/decisions/`
     pub decisions_dir: PathBuf,
-    /// Event store directory: `.bicameral/events/`
-    pub events_dir: PathBuf,
+    /// Candidates inbox: `.bicameral/candidates-inbox/`
+    /// Non-canonical pending candidates awaiting governance review.
+    /// This is NOT the canonical event store — only `EventStoreAdapter::append()`
+    /// materializes accepted governance events.
+    pub candidates_inbox_dir: PathBuf,
     /// Audit receipts directory: `.bicameral/audit/`
     pub audit_dir: PathBuf,
     /// Mod manifests directory: `.bicameral/mods/`
@@ -31,7 +34,7 @@ impl BicameralPaths {
         Self {
             config_file: dot_bicameral.join("config.yaml"),
             decisions_dir: dot_bicameral.join("decisions"),
-            events_dir: dot_bicameral.join("events"),
+            candidates_inbox_dir: dot_bicameral.join("candidates-inbox"),
             audit_dir: dot_bicameral.join("audit"),
             mods_dir: dot_bicameral.join("mods"),
             attestations_dir: dot_bicameral.join("factory-attestations"),
@@ -49,11 +52,35 @@ impl BicameralPaths {
     pub fn ensure_dirs(&self) -> std::io::Result<()> {
         std::fs::create_dir_all(&self.dot_bicameral)?;
         std::fs::create_dir_all(&self.decisions_dir)?;
-        std::fs::create_dir_all(&self.events_dir)?;
+        std::fs::create_dir_all(&self.candidates_inbox_dir)?;
         std::fs::create_dir_all(&self.audit_dir)?;
         std::fs::create_dir_all(&self.mods_dir)?;
         std::fs::create_dir_all(&self.attestations_dir)?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn inbox_dir_is_not_named_events() {
+        let paths = BicameralPaths::from_workspace_root("/tmp/test-ws");
+        let inbox_name = paths
+            .candidates_inbox_dir
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap();
+        assert_eq!(
+            inbox_name, "candidates-inbox",
+            "Inbox directory must be named 'candidates-inbox', not 'events'"
+        );
+        assert!(
+            !inbox_name.contains("event"),
+            "Inbox directory name must not contain 'event' to avoid confusion with canonical event store"
+        );
     }
 }
 

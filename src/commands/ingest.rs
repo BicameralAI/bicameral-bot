@@ -34,8 +34,10 @@ pub async fn run(file: &Path, workspace: Option<&Path>) -> anyhow::Result<()> {
         format!("Ingested from file: {}", file.display()),
     )?;
 
-    // Write candidate to events dir as pending
-    let candidate_file = paths.events_dir.join(format!("{}.json", candidate.id));
+    // Write candidate to inbox as pending (non-canonical; not event-store materialization)
+    let candidate_file = paths
+        .candidates_inbox_dir
+        .join(format!("{}.json", candidate.id));
     let candidate_json = serde_json::to_string_pretty(&candidate)?;
     std::fs::write(&candidate_file, candidate_json)?;
 

@@ -74,6 +74,22 @@ mod tests {
     }
 
     #[test]
+    fn default_policy_does_not_permit_materialization() {
+        let engine = GovernanceEngine::new(GovernancePolicyConfig::default());
+        let candidate = DecisionCandidate::new(
+            "Test".to_string(),
+            "Description".to_string(),
+            DecisionLevel::Architecture,
+            "test-source".to_string(),
+        );
+        let result = engine.evaluate(&candidate);
+        assert!(
+            !GovernanceEngine::may_materialize(&result),
+            "Default policy must not permit materialization without human review"
+        );
+    }
+
+    #[test]
     fn test_rejects_low_confidence() {
         let config = GovernancePolicyConfig {
             require_review: false,

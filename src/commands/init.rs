@@ -14,7 +14,7 @@ pub async fn run(path: &Path) -> anyhow::Result<()> {
 
     println!("Initialized Bicameral workspace at {}", abs_path.display());
     println!("  Config: {}", paths.config_file.display());
-    println!("  Events: {}", paths.events_dir.display());
+    println!("  Inbox:  {}", paths.candidates_inbox_dir.display());
     println!("  Audit:  {}", paths.audit_dir.display());
     println!("  Mods:   {}", paths.mods_dir.display());
 

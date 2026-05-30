@@ -11,11 +11,11 @@ pub async fn run(target: &str, workspace: Option<&Path>) -> anyhow::Result<()> {
     println!("Running preflight checks for: {}", target);
     println!("  Workspace: {}", paths.workspace_root.display());
 
-    // Load existing decisions/events for comparison
-    let events_dir = &paths.events_dir;
+    // Load pending candidates from inbox for comparison
+    let inbox_dir = &paths.candidates_inbox_dir;
     let mut decision_count = 0;
-    if events_dir.exists() {
-        for entry in std::fs::read_dir(events_dir)? {
+    if inbox_dir.exists() {
+        for entry in std::fs::read_dir(inbox_dir)? {
             let entry = entry?;
             if entry.path().extension().and_then(|e| e.to_str()) == Some("json") {
                 decision_count += 1;
