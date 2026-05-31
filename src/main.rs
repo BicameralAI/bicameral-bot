@@ -55,6 +55,8 @@ enum Commands {
         #[command(subcommand)]
         action: GatewayAction,
     },
+    /// Start the local dashboard (serves compiled assets, no Node required)
+    Dashboard,
     /// Check service status
     Service {
         #[command(subcommand)]
@@ -134,6 +136,7 @@ async fn main() -> anyhow::Result<()> {
         Commands::Gateway { action } => match action {
             GatewayAction::Start => commands::gateway::start(cli.workspace.as_deref()).await,
         },
+        Commands::Dashboard => commands::dashboard::start(cli.workspace.as_deref()).await,
         Commands::Service { action } => match action {
             ServiceAction::Status => commands::service::status().await,
         },

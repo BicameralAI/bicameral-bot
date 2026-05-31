@@ -8,10 +8,12 @@
 //! See NOTICE and runtime/UPSTREAM-ZEROCLAW.md for attribution.
 
 pub mod candidate;
+pub mod dashboard;
 pub mod event_store;
 pub mod evidence;
 pub mod governance;
 pub mod review;
+pub mod source;
 
 pub use candidate::{DecisionCandidate, DecisionLevel, ExtractionConfidence};
 pub use event_store::{EventStoreAdapter, EventStoreEntry, EventStoreError, SubstrateKind};

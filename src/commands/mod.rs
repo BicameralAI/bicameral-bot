@@ -1,3 +1,4 @@
+pub mod dashboard;
 pub mod doctor;
 pub mod gateway;
 pub mod ingest;

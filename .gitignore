@@ -15,6 +15,10 @@ Thumbs.db
 # Bicameral local-only
 .bicameral/factory-context.local.json
 
+# Dashboard
+dashboard/node_modules/
+dashboard/dist/
+
 # Agent scratch (do not commit)
 .agents/
 .bicameral/factory-skills/
