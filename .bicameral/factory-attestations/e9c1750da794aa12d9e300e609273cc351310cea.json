@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "factory_repo": "BicameralAI/bicameral-factory",
+  "factory_commit": "e9c1750da794aa12d9e300e609273cc351310cea",
+  "loaded_context": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "INSTRUCTIONS.md",
+    "CONTEXT.md",
+    "PAMA.md",
+    "skills/factory-skill-manifest.json",
+    "skills/bic/mattpocock/engineering/grill-with-docs/SKILL.md",
+    "skills/bic/mattpocock/engineering/grill-with-docs/ADR-FORMAT.md",
+    "skills/bic/pre-pr-factory-attestation/SKILL.md",
+    "blueprints/factory-attestation.md"
+  ],
+  "context_evidence": {
+    "README.md": {
+      "source": "agent-declared",
+      "reason": "Baseline factory repository context for the session.",
+      "sha256": "ec144df586c5a13ddba7d2f44101c31c592dbc22679e6c9a6d20e9c2429d58c1"
+    },
+    "CONTRIBUTING.md": {
+      "source": "agent-declared",
+      "reason": "PAMA contribution, local setup divergence, and product PR process rules.",
+      "sha256": "4ffc8f1cfd2c7708d707e0e5624a73380497f2f1cfe796da8c541d5d76c92fa5"
+    },
+    "INSTRUCTIONS.md": {
+      "source": "agent-declared",
+      "reason": "Factory setup instructions used to install copied bic:* skills and local context.",
+      "sha256": "13b8273dbc046b2ec940f34e289db3b0a73e6f558a481ee29b95f65a29bd62eb"
+    },
+    "CONTEXT.md": {
+      "source": "agent-declared",
+      "reason": "Factory and Bicameral domain language used while reviewing the ADR.",
+      "sha256": "f8b93a68402d21e390ebabf6c54c47b39be46c52296a56148a0655e10013482f"
+    },
+    "PAMA.md": {
+      "source": "agent-declared",
+      "reason": "Authority-boundary context for factory process and attestation posture.",
+      "sha256": "608b4bf5e33aacfdd882b8adf27c7062cf591bcac8a265724b7d476c9332dfa2"
+    },
+    "skills/factory-skill-manifest.json": {
+      "source": "agent-declared",
+      "reason": "Manifest used to verify copied bic:grill-with-docs skill provenance.",
+      "sha256": "c00439b68970d1f007a822631c8e211d749c167dbe1c18abab4b7ea987c923b4"
+    },
+    "skills/bic/mattpocock/engineering/grill-with-docs/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Review procedure used to challenge ADR terms against existing docs.",
+      "sha256": "1ece0c6bf0eef08bcb8882c9e945655712da089b65e262ac91b54d3a617ef352"
+    },
+    "skills/bic/mattpocock/engineering/grill-with-docs/ADR-FORMAT.md": {
+      "source": "agent-declared",
+      "reason": "ADR guidance used to keep the document scoped to a real trade-off.",
+      "sha256": "f1f36cd3f8d3b6474ddd5855da4e233bfc4ae1a1c5024909ccf11871819a41b2"
+    },
+    "skills/bic/pre-pr-factory-attestation/SKILL.md": {
+      "source": "agent-declared",
+      "reason": "Procedure used to create and validate this factory attestation.",
+      "sha256": "56c0c0e0cb1fce20cafbe4f485894a8126a0756debffcf4678e1e0e03ef1aa2e"
+    },
+    "blueprints/factory-attestation.md": {
+      "source": "agent-declared",
+      "reason": "Schema and validation expectations for product-repo factory attestations.",
+      "sha256": "5daf259c8390f5e99547ae2ef6ff9e6f4783b5a54afb9d5588560d8ff98a534a"
+    }
+  },
+  "local_setup_divergence": {
+    "checked": true,
+    "resolution": "none",
+    "notes": "Factory checkout was available locally, copied bic:* skills were installed under .agents/skills, skill hashes were checked against the factory manifest, and local-only setup files were excluded from git."
+  },
+  "end_of_session_capture": {
+    "run": true,
+    "factory_pr": null,
+    "notes": "No reusable factory artifact or correction was discovered; product-context terms GraphSnapshot, GraphEvidenceState, and SymbolOccurrence were promoted into CONTEXT.md."
+  },
+  "attested_by": "Codex",
+  "timestamp": "2026-05-30T19:48:47Z",
+  "target_repo": "BicameralAI/bicameral-bot",
+  "target_branch": "docs-adr-local-code-graph-snapshot-contract",
+  "agent": "Codex"
+}

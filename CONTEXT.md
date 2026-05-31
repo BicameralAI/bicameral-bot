@@ -24,6 +24,12 @@ Bicameral captures implementation-constraining decisions from product, code, and
 `BindingEvidence`
 : Reviewable evidence relating a Decision to a code path, symbol, diff, dependency, workflow, or deploy surface.
 
+`GraphSnapshot`
+: Named code snapshot against which local or hosted graph evidence is validated. In git-backed workspaces this is anchored by repository identity, commit SHA, and graph index version; branch names are provenance, not durable identity.
+
+`SymbolOccurrence`
+: Symbol observed at a specific GraphSnapshot with enough path, range, content hash, and parser or resolver evidence to support reviewable grounding.
+
 `GovernanceResult`
 : Substrate-neutral outcome of governance or conflict analysis.
 
@@ -73,6 +79,9 @@ Bicameral captures implementation-constraining decisions from product, code, and
 
 `Status / compliance state`
 : Code-compliance state for a Decision, computed or reviewed from grounding and drift evidence.
+
+`GraphEvidenceState`
+: Evidence state of a graph or symbol claim, such as verified, not found, unknown_not_indexed, unknown_stale, ambiguous, unsupported, or approximate candidate. Only verified graph claims can become BindingEvidence or support blocking governance results.
 
 `Read/write path`
 : Review surfaces, MCP tools, integrations, and mods emit substrate-neutral commands/evidence; governance policy and event store adapters decide materialization.
