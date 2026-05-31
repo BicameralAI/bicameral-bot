@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "factory_repo": "BicameralAI/bicameral-factory",
+  "factory_commit": "0202291be5ba90a1a5fbacc236f9df5a17c395b4",
+  "loaded_context": [
+    "playbooks/devin-bicameral-factory-run.md"
+  ],
+  "context_evidence": {
+    "playbooks/devin-bicameral-factory-run.md": {
+      "source": "agent-declared",
+      "reason": "Canonical factory playbook governing this implementation run.",
+      "sha256": "9c0d86e678d1f595b7553c3fb6ca57cd2937df97660a5a10e26fa965b9a6dc39"
+    }
+  },
+  "task": "Implement GitHub issue #16 — dashboard v0.1 with Ingestion Gate and Ledger View",
+  "audit_strength": "agent-declared",
+  "attested_by": "Devin (Bicameral Factory Run playbook)",
+  "timestamp": "2026-05-31T00:25:00.000000+00:00",
+  "local_setup_divergence": {
+    "checked": true,
+    "resolution": "none",
+    "notes": "No local setup divergence. Factory context loaded from main at 0202291."
+  },
+  "end_of_session_capture": {
+    "run": true,
+    "checks_run": [
+      "cargo fmt --all -- --check",
+      "cargo build",
+      "cargo test --workspace",
+      "npm run build (dashboard/)"
+    ],
+    "checks_passed": true,
+    "factory_artifacts_in_diff": false,
+    "notes": "All checks pass. No factory scratch artifacts in product diff. 18 tests pass (10 gateway incl. 6 new dashboard tests, 4 mods, 3 governance, 1 config)."
+  },
+  "notes": "Factory playbook read from BicameralAI/bicameral-factory main. Followed startup checklist, implementation boundaries, verification. No factory scratch artifacts committed. Dashboard assets (node_modules, dist) excluded via .gitignore."
+}
