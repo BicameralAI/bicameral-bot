@@ -2,80 +2,104 @@
 
 Bicameral captures implementation-constraining decisions from product, code, and collaboration evidence, then routes them through review into a durable event authority.
 
-## Language
+## Domain Model
 
-**Decision**:
-A binding constraint on implementation. Not a suggestion, opinion, note, or general product knowledge.
-_Avoid_: note, feedback, request, product knowledge
+### Entities
 
-**DecisionCandidate**:
-An extracted claim that has not yet been accepted into the Decision Ledger. It is non-canonical until governance policy accepts a review command and the selected event store substrate materializes the event.
-_Avoid_: approved decision, canonical record, source note
+`Decision`
+: Binding constraint on implementation.
 
-**SourceEvidence**:
-The excerpt, pointer, payload, or provenance record that supports a candidate, binding, dependency signal, or governance result.
-_Avoid_: vague context, model memory
+`DecisionCandidate`
+: Extracted claim awaiting governed promotion into the Decision Ledger.
 
-**BindingEvidence**:
-Reviewable evidence that a decision relates to a code path, symbol, diff, dependency, workflow, or deploy surface.
-_Avoid_: compliance verdict, signoff, status
+`Source`
+: Mutable external object linkage identified by URI.
 
-**GraphSnapshot**:
-The named code snapshot against which local or hosted graph evidence is validated. In git-backed workspaces this is anchored by repository identity, commit SHA, and graph index version; branch names are provenance, not durable identity.
-_Avoid_: branch, latest index, mutable repo graph
+`SourceSnapshot`
+: Immutable captured view of a Source, identified by content address.
 
-**GraphEvidenceState**:
-The evidence state of a graph or symbol claim, such as verified, not found, unknown, ambiguous, unsupported, or approximate candidate. Only verified graph claims can become BindingEvidence or support blocking governance results.
-_Avoid_: ranking score, confidence score, search result
+`SourceEvidence`
+: Pointer into one SourceSnapshot.
 
-**SymbolOccurrence**:
-A symbol observed at a specific GraphSnapshot with enough path, range, content hash, and parser or resolver evidence to support reviewable grounding.
-_Avoid_: symbol name alone, search hit, stable identity without snapshot
+`BindingEvidence`
+: Reviewable evidence relating a Decision to a code path, symbol, diff, dependency, workflow, or deploy surface.
 
-**Decision Ledger**:
-The canonical materialized decision record derived by replaying the selected event store substrate. Durable write authority remains the event store substrate.
-_Avoid_: UI page, hosted cache, dashboard database
+`GraphSnapshot`
+: Named code snapshot against which local or hosted graph evidence is validated. In git-backed workspaces this is anchored by repository identity, commit SHA, and graph index version; branch names are provenance, not durable identity.
 
-**Ledger View**:
-The human-facing surface for inspecting Decision Ledger state and emitting review commands. It is not durable authority.
-_Avoid_: Decision Ledger, source of truth
+`SymbolOccurrence`
+: Symbol observed at a specific GraphSnapshot with enough path, range, content hash, and parser or resolver evidence to support reviewable grounding.
 
-**Governance policy**:
-Configurable rules that decide how candidates, review commands, and evidence route to review, advisory state, materialization, or enforcement according to workspace capability.
-_Avoid_: connector logic, model prompt, fixed org-chart role
+`GovernanceResult`
+: Substrate-neutral outcome of governance or conflict analysis.
 
-**GovernanceResult**:
-A substrate-neutral outcome of governance or conflict analysis. It can express blocking, warning, or informational intent; each substrate maps it to honest enforcement channels.
-_Avoid_: CI result only, dashboard warning only
+`ModManifest`
+: Declarative configuration artifact for EM-safe evidence-producing mods.
 
-**EventStoreAdapter**:
-The substrate-specific materialization boundary for accepted governance events. Adapters append and replay canonical event entries for git, drive-folder, in-memory, or future substrates; callers must not bypass them with direct canonical writes.
-_Avoid_: generic persistence helper, cache writer, direct decision writer
+### Lifecycle Verbs
 
-**ModManifest**:
-A declarative configuration artifact for EM-safe mods: triggers, filters, and allowed evidence-producing actions. A manifest can shape candidate/routing/advisory behavior, but it cannot approve signoff, resolve compliance, or grant itself new authority.
-_Avoid_: plugin with arbitrary code authority, policy override, approval script
+`Promote`
+: Governed transition that turns a DecisionCandidate into a Decision Ledger record.
 
-**Signoff**:
-The ownership lifecycle on a Decision. Approval is separate from candidate acceptance and separate from code compliance.
-_Avoid_: status, compliance, drift, ratification
+`Demote`
+: Governed Ledger View transition that lowers a Decision's authority without recreating it as a candidate.
 
-**Status / compliance state**:
-The code-compliance state for a decision. It is computed or reviewed from grounding and drift evidence, not hand-authored as signoff.
-_Avoid_: signoff, approval
+## Relationships
 
-**Read/write path**:
-Review surfaces, MCP tools, integrations, and mods emit substrate-neutral commands/evidence. Governance policy and event store adapters decide materialization.
-_Avoid_: UI writes YAML, connector writes canonical decisions directly
+`DecisionCandidate` cites `SourceEvidence` [0..*].
 
-**Local daemon**:
-The local Bicameral core that validates protocol objects, evaluates governance policy, preserves audit state, performs local grounding, and materializes accepted events through storage adapters.
-_Avoid_: hosted daemon, cloud oracle
+`Decision` cites `SourceEvidence` [1..*].
 
-**Gateway**:
-The local edge boundary that adapts operational sources into typed protocol objects before they enter daemon governance.
-_Avoid_: canonical writer, source of truth
+`SourceEvidence` points into `SourceSnapshot` [1].
 
-**Protocol folder**:
-The in-repo `protocol/` module owned by `bicameral-bot`, containing shared object schemas and conformance fixtures used by bot, MCP, integrations, and cloud clients.
-_Avoid_: separate protocol service, separate source-of-truth repo
+`SourceSnapshot` captures `Source` [1].
+
+`Source` has `SourceSnapshot` [0..*].
+
+`Promote` turns `DecisionCandidate` into `Decision` [0..1].
+
+`Demote` targets `Decision` [1].
+
+## Supporting Terms
+
+`Decision Ledger`
+: Canonical materialized decision state derived by replaying the selected event store substrate.
+
+`Ledger View`
+: Human-facing surface for inspecting Decision Ledger state and emitting review commands.
+
+`Governance policy`
+: Rules that decide how candidates, review commands, and evidence route to review, advisory state, materialization, or enforcement.
+
+`EventStoreAdapter`
+: Substrate-specific materialization boundary for accepted governance events.
+
+`Signoff`
+: Ownership lifecycle on a Decision, separate from candidate acceptance and code compliance.
+
+`Status / compliance state`
+: Code-compliance state for a Decision, computed or reviewed from grounding and drift evidence.
+
+`GraphEvidenceState`
+: Evidence state of a graph or symbol claim, such as verified, not found, unknown_not_indexed, unknown_stale, ambiguous, unsupported, or approximate candidate. Only verified graph claims can become BindingEvidence or support blocking governance results.
+
+`Read/write path`
+: Review surfaces, MCP tools, integrations, and mods emit substrate-neutral commands/evidence; governance policy and event store adapters decide materialization.
+
+`Local daemon`
+: Local core that validates protocol objects, evaluates governance policy, preserves audit state, performs local grounding, and materializes accepted events.
+
+`Gateway`
+: Local edge boundary that adapts operational sources into typed protocol objects before they enter daemon governance.
+
+`Protocol folder`
+: In-repo `protocol/` module containing shared object schemas and conformance fixtures used by bot, MCP, integrations, and cloud clients.
+
+## Terminology Notes
+
+- `Decision` is not a suggestion, opinion, note, or general product knowledge.
+- `DecisionCandidate` is non-canonical until governance policy accepts a review command and the selected event store substrate materializes the event.
+- `Source` is not immutable evidence; immutable evidence is cited through `SourceSnapshot` and `SourceEvidence`.
+- `Ledger View`, dashboards, SurrealDB, search indexes, and hosted graphs are not durable authority.
+- `Signoff` is not compliance, drift, or grounding status.
+- Frontend, CLI, MCP, connector, and mod surfaces must not create Decisions directly; they use `Promote`.

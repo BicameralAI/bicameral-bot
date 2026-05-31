@@ -39,7 +39,8 @@ Define a **substrate-neutral governance flow** as the only path from source evid
 
 ```text
 1. Evidence Capture
-   source connector, agent session, manual entry, or mod emits SourceEvidence
+   source connector, agent session, manual entry, or mod records Source,
+   SourceSnapshot, and SourceEvidence
         ↓
 2. Candidate Projection
    extractor/mod creates DecisionCandidate, BindingHint, DependencySignal, or advisory GovernanceResult
@@ -81,6 +82,8 @@ These parts are not customizable by individual integrations or mods.
 The core domain vocabulary is shared across substrates:
 
 - `SourceEvidence`
+- `Source`
+- `SourceSnapshot`
 - `DecisionCandidate`
 - `Decision`
 - `ReviewCommand`
@@ -97,6 +100,9 @@ Connectors and mods may add metadata, but they must map back to these objects be
 ### 2. Authority separation
 
 - Extraction can propose a `DecisionCandidate`; it cannot approve decision meaning.
+- Decision creation is never a manual operation. Frontend, CLI, MCP, connector,
+  and mod surfaces can create or edit candidates; a `Decision` can only appear
+  in the Decision Ledger through the governed candidate promotion path.
 - Owner/member review owns signoff according to workspace governance policy.
 - Code graph/grounding owns `BindingEvidence`; source connectors can only provide hints.
 - Compliance/drift analysis owns `ComplianceVerdict`; weak or unreviewed verdicts remain advisory.
@@ -119,6 +125,25 @@ A strong value on one axis cannot compensate for weakness on another. For exampl
 ### 4. Replayability
 
 Every canonical state must be rebuildable from the selected event store substrate. SurrealDB, dashboard stores, search indexes, and hosted code graph state are caches/materializations, not authority.
+
+Source provenance must remain verifiable after the source system changes or
+disappears. A `Source` records the mutable external object linkage. A
+`SourceSnapshot` records the immutable captured view of that object, identified
+by a UOR-compatible content address over the canonical snapshot representation.
+`SourceEvidence` cites one pointer into a source snapshot, so
+candidates, decisions, bindings, and governance results can be audited without
+relying on the live source system still returning the same content.
+Candidates, decisions, and governance results may cite multiple
+`SourceEvidence` records when a claim depends on multiple source regions or
+multiple sources.
+
+`SourceSnapshot` is not an archival mirror of every external source update.
+Bicameral records a new snapshot when the captured source state affects
+Bicameral internal state: candidate projection, candidate invalidation, review
+evidence, decision provenance, binding/governance evidence, freshness-sensitive
+governance, or collision/dependency analysis. If an external source changes but
+Bicameral does not use that change for governance, review, or materialized
+state, the change does not need to become a snapshot event.
 
 ### 5. Allowed-command gating
 
@@ -143,7 +168,7 @@ These parts are intentionally configurable by workspace, source integration, eve
 
 | Flow stage | Customizable | Not customizable |
 |---|---|---|
-| Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers | provenance must be recorded; secrets must not be persisted as canonical content |
+| Evidence Capture | source connector, polling vs webhook, source filters, redaction/pointers, snapshot representation | source URI, snapshot identity, and evidence pointers must be recorded; secrets must not be persisted as canonical content |
 | Candidate Projection | extraction prompts/rules, labels, feature hints, owner lens, suggested reviewers, domain metadata | outputs remain candidates/hints/signals until policy accepts them |
 | Policy Evaluation | source trust, automation mode, required reviewer by level/source, low-risk auto-candidate thresholds | policy cannot skip replayability, authority separation, or substrate capability checks |
 | Review Surface | dashboard, Slack, CLI/TUI, PR comment, Drive batch UI, copy/presentation | surfaces emit shared `ReviewCommand`s; they do not invent authority semantics |
@@ -168,6 +193,35 @@ Initial command vocabulary:
 - `untrack_source`
 - `pause_approval`
 - `resume_approval`
+
+`accept_candidate` is the v0.1 Promote command: it promotes a valid
+`DecisionCandidate` into a Decision Ledger record with `signoff.state =
+proposed`. Future protocol revisions may rename this command to
+`promote_candidate`, but they must preserve the invariant that all Decision
+creation goes through candidate promotion.
+
+Ingestion Gate `Ingest` is a UI-level batch action over an already-projected
+candidate set for a source snapshot. It is not candidate creation. It emits one or
+more candidate promotion commands for the remaining candidates after the reviewer
+has rejected or edited unwanted candidates. Candidate rejection before ingest is
+a durable `reject_candidate` transition, not a local UI discard. Replay must
+preserve each candidate rejection and promotion as its own lifecycle transition.
+
+A promoted Decision enters `signoff.state = proposed` by default. `proposed` is
+the post-ingest dependency/collision-check staging state: the Decision is now in
+the Ledger and can be compared against existing Decisions, but it is not approved
+until policy and dependency checks resolve. If checks pass and policy permits
+automatic approval, the Decision may transition to `approved`. If checks find a
+conflict, it transitions to `collision_pending`. If checks are unavailable or
+stubbed, it remains `proposed`.
+
+Demotion is a Decision lifecycle operation, not candidate intake. A frontend
+Ledger View may directly initiate demotion commands for existing Decisions, such
+as `reject_signoff`, `supersede_decision`, or a future `demote_decision` /
+`remove_decision` command. Direct frontend initiation does not mean direct
+storage mutation: the command must still pass through governance policy,
+materialize through the selected event store substrate, and replay into Ledger
+state.
 
 Commands are substrate-neutral. `accept_candidate` means the extracted candidate is valid enough to become a Decision Ledger record with `signoff.state = proposed`; it does not approve signoff. `reject_candidate` means the extracted claim is not a valid Decision and records review/audit history without creating a Decision by default. `approve_signoff` means the workspace policy permits the actor/action to move ownership signoff to `approved`. `reject_signoff` means an existing proposed Decision is explicitly rejected and remains inspectable in the Decision Ledger with `signoff.state = rejected`. `resolve_compliance` means grounding, binding, or drift evidence has been reviewed enough to resolve the compliance state. The event store adapter decides whether an accepted command becomes a git commit, Drive file write, queued local event awaiting durable sync, or another substrate-specific artifact. Canonical lifecycle changes must still replay from the selected event store substrate; dashboard-only annotations remain non-canonical.
 
@@ -221,16 +275,24 @@ ReviewCommand
 Candidate intake has two outcomes:
 
 ```text
-SourceEvidence
+Source + SourceSnapshot + SourceEvidence
   → DecisionCandidate
   → reject_candidate
   → rejected candidate review event only; no Decision Ledger record by default
 
-SourceEvidence
+Source + SourceSnapshot + SourceEvidence
   → DecisionCandidate
-  → accept_candidate
+  → Ingestion Gate Ingest
+  → accept_candidate / Promote per remaining candidate
   → Decision Ledger record with signoff.state = proposed
+  → dependency/collision check
+  → signoff.state = approved | collision_pending | proposed
 ```
+
+There is no parallel transition from manual UI/CLI input directly to
+`Decision`. Manual input enters as `SourceEvidence` and/or a
+`DecisionCandidate`, then follows the same promotion path as connector,
+integration, MCP, or mod output.
 
 Once a Decision exists, signoff and compliance advance independently:
 

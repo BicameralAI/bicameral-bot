@@ -134,6 +134,13 @@ It must accept one of:
 - a verified occurrence or validation token returned by validation; or
 - a symbol/path request plus explicit snapshot identity, which `bind` revalidates before materializing.
 
+Validation tokens must bind to at least `graph_snapshot_id`, `validated_sha`,
+validated symbol or occurrence identity, validator identity, evidence state,
+issue time, and expiry time. They must be integrity-protected by the issuing
+validator, and `bind` must verify the token integrity, snapshot identity, and
+`evidence_state = verified` before materializing. Expired, revoked, mismatched,
+or non-verified tokens must be rejected or revalidated.
+
 If validation occurred at one snapshot and binding is requested at another, `bind` must reject with a typed snapshot mismatch or revalidate at the requested snapshot. It must not silently reinterpret a successful validation result against a different ref or commit.
 
 ### preflight

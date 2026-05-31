@@ -69,7 +69,7 @@
   "local_setup_divergence": {
     "checked": true,
     "resolution": "none",
-    "notes": "Factory checkout was cloned to /Users/silongtan/github/bicameral-factory, copied bic:* skills were installed under .agents/skills, skill hashes were checked against the factory manifest, and local-only setup files were excluded from git."
+    "notes": "Factory checkout was available locally, copied bic:* skills were installed under .agents/skills, skill hashes were checked against the factory manifest, and local-only setup files were excluded from git."
   },
   "end_of_session_capture": {
     "run": true,
