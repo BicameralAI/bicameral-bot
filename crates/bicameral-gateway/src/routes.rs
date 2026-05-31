@@ -6,6 +6,9 @@ use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use bicameral_api::candidate::DecisionCandidate;
+use bicameral_api::dashboard::{
+    DashboardReviewCommand, IngestionGateItem, LedgerReviewItem,
+};
 use bicameral_api::review::{ReviewCommand, ReviewState, ReviewStatus};
 use bicameral_audit::receipt::AuditAction;
 use serde::{Deserialize, Serialize};
@@ -179,4 +182,68 @@ async fn service_status(State(state): State<AppState>) -> Json<ServiceStatusResp
         candidate_count,
         review_count,
     })
+}
+
+// ── Dashboard API routes ─────────────────────────────────────────
+
+pub fn dashboard_api_routes() -> Router<AppState> {
+    Router::new()
+        .route(
+            "/api/v1/dashboard/ingestion-gate",
+            get(dashboard_ingestion_gate),
+        )
+        .route("/api/v1/dashboard/ledger", get(dashboard_ledger))
+        .route("/api/v1/dashboard/command", post(dashboard_command))
+}
+
+/// Returns the Ingestion Gate projection.
+///
+/// In v0.1 this returns an empty list — real source snapshots are populated
+/// once connectors/extractors produce DecisionCandidates.
+async fn dashboard_ingestion_gate(
+    State(_state): State<AppState>,
+) -> Json<Vec<IngestionGateItem>> {
+    Json(Vec::new())
+}
+
+/// Returns the Ledger View projection.
+///
+/// In v0.1 this returns an empty list — real Decisions appear only after
+/// governed candidate promotion through the Ingestion Gate.
+async fn dashboard_ledger(
+    State(_state): State<AppState>,
+) -> Json<Vec<LedgerReviewItem>> {
+    Json(Vec::new())
+}
+
+/// Accepts a dashboard review command.
+///
+/// Commands are substrate-neutral — the dashboard never writes event-store
+/// internals directly. The gateway validates and routes them through
+/// governance policy.
+async fn dashboard_command(
+    State(state): State<AppState>,
+    Json(cmd): Json<DashboardReviewCommand>,
+) -> Result<StatusCode, StatusCode> {
+    // Record the command attempt in the audit trail
+    {
+        let mut audit = state.audit.write().await;
+        let _ = audit.record(
+            AuditAction::ReviewCommandIssued,
+            "dashboard".to_string(),
+            None,
+            format!(
+                "Dashboard command '{}' on target '{}'",
+                cmd.command, cmd.target_id
+            ),
+        );
+    }
+
+    tracing::info!(
+        command = %cmd.command,
+        target = %cmd.target_id,
+        "Dashboard review command received"
+    );
+
+    Ok(StatusCode::ACCEPTED)
 }

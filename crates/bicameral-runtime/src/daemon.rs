@@ -6,7 +6,8 @@
 
 use bicameral_audit::store::AuditStore;
 use bicameral_config::{BicameralConfig, BicameralPaths};
-use bicameral_gateway::{serve, AppState};
+use bicameral_gateway::{serve_with_dashboard, AppState};
+use std::path::PathBuf;
 use tokio::sync::watch;
 
 /// Why the daemon's main loop exited.
@@ -29,6 +30,14 @@ pub struct DaemonConfig {
 /// section 7.1) and waits for a shutdown signal. Returns the exit reason so
 /// the caller can decide whether to restart.
 pub async fn run(daemon_config: DaemonConfig) -> anyhow::Result<DaemonExit> {
+    run_with_dashboard(daemon_config, None).await
+}
+
+/// Run the Bicameral daemon with optional dashboard asset serving.
+pub async fn run_with_dashboard(
+    daemon_config: DaemonConfig,
+    dashboard_dir: Option<PathBuf>,
+) -> anyhow::Result<DaemonExit> {
     tracing::info!("Starting Bicameral daemon");
 
     let audit = AuditStore::open(&daemon_config.paths.audit_dir)?;
@@ -51,7 +60,9 @@ pub async fn run(daemon_config: DaemonConfig) -> anyhow::Result<DaemonExit> {
     let gateway_config = daemon_config.config.gateway.clone();
     let gateway_state = state.clone();
     let gateway_handle = tokio::spawn(async move {
-        if let Err(e) = serve(&gateway_config, gateway_state, shutdown_rx).await {
+        if let Err(e) =
+            serve_with_dashboard(&gateway_config, gateway_state, shutdown_rx, dashboard_dir).await
+        {
             tracing::error!(error = %e, "Gateway error");
         }
     });
