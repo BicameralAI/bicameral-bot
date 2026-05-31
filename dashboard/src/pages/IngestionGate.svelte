@@ -32,10 +32,10 @@
 
   function freshnessColor(f: string) {
     switch (f) {
-      case "fresh": return "#4ade80";
-      case "stale": return "#fbbf24";
-      case "offline": return "#f87171";
-      default: return "#6b7280";
+      case "fresh": return "#059669";
+      case "stale": return "#d97706";
+      case "offline": return "#dc2626";
+      default: return "#9ca3af";
     }
   }
 
@@ -69,11 +69,13 @@
 </script>
 
 <section>
-  <h2>Ingestion Gate</h2>
-  <p class="subtitle">
-    Source-derived candidates awaiting governed promotion. Decisions are created
-    only through batch ingestion — not manual entry.
-  </p>
+  <header class="page-header">
+    <h1>Ingestion Gate</h1>
+    <p class="subtitle">
+      Source-derived candidates awaiting governed promotion. Decisions are created
+      only through batch ingestion — not manual entry.
+    </p>
+  </header>
 
   {#if loading}
     <div class="empty">Loading sources…</div>
@@ -91,7 +93,7 @@
     </div>
   {:else}
     <div class="gate-layout">
-      <div class="source-list">
+      <aside class="source-list">
         {#each items as item, idx}
           <button
             class="source-card"
@@ -111,24 +113,24 @@
             </span>
           </button>
         {/each}
-      </div>
+      </aside>
 
       {#if selectedIdx !== null && items[selectedIdx]}
         {@const sel = items[selectedIdx]}
         <div class="detail-pane">
           <div class="detail-header">
-            <h3>{sel.source_title}</h3>
-            <div class="snapshot-info">
-              <span>URI: <code>{sel.source.uri}</code></span>
-              <span>Snapshot: <code>{sel.snapshot.snapshot_addr}</code></span>
-              <span>Ref: <code>{sel.snapshot.snapshot_ref}</code></span>
-              <span>Captured: {sel.snapshot.captured_at}</span>
-            </div>
+            <h2>{sel.source_title}</h2>
+            <dl class="snapshot-meta">
+              <dt>URI</dt><dd><code>{sel.source.uri}</code></dd>
+              <dt>Snapshot</dt><dd><code>{sel.snapshot.snapshot_addr}</code></dd>
+              <dt>Ref</dt><dd><code>{sel.snapshot.snapshot_ref}</code></dd>
+              <dt>Captured</dt><dd>{sel.snapshot.captured_at}</dd>
+            </dl>
           </div>
 
           {#if sel.evidence.length > 0}
-            <div class="evidence-section">
-              <h4>Source evidence</h4>
+            <div class="section">
+              <h3>Source evidence</h3>
               {#each sel.evidence as ev}
                 <div class="evidence-item">
                   <span class="pointer-type">{ev.pointer_type}</span>
@@ -139,8 +141,8 @@
             </div>
           {/if}
 
-          <div class="candidates-section">
-            <h4>Candidates</h4>
+          <div class="section">
+            <h3>Candidates</h3>
             {#if sel.candidates.length === 0}
               <p class="empty-inline">No candidates extracted for this snapshot.</p>
             {:else}
@@ -151,7 +153,7 @@
                     <span class="feature-hint">{c.feature_hint}</span>
                   {/if}
                   {#if c.conflict_hint}
-                    <span class="badge collision">conflict hint</span>
+                    <span class="badge collision">conflict</span>
                   {/if}
                   {#if c.review_state}
                     <span class="badge review-state">{c.review_state}</span>
@@ -180,88 +182,142 @@
 </section>
 
 <style>
-  h2 { margin: 0 0 0.25rem; font-size: 1.1rem; }
-  .subtitle { color: #6b7280; font-size: 0.8rem; margin: 0 0 1rem; }
+  section { max-width: 1100px; }
+
+  .page-header { margin-bottom: 1.25rem; }
+  h1 { font-size: 1.35rem; font-weight: 600; margin: 0 0 0.25rem; color: #1a1a2e; }
+  .subtitle { color: #6b7280; font-size: 0.8rem; margin: 0; }
 
   .empty {
     text-align: center;
     padding: 3rem 1rem;
-    color: #6b7280;
+    color: #9ca3af;
   }
   .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-  .empty-title { font-size: 1rem; font-weight: 600; color: #9ca3af; }
-  .empty-body { font-size: 0.8rem; max-width: 440px; margin: 0.5rem auto 0; line-height: 1.5; }
+  .empty-title { font-size: 1rem; font-weight: 600; color: #6b7280; }
+  .empty-body { font-size: 0.82rem; max-width: 440px; margin: 0.5rem auto 0; line-height: 1.5; }
 
-  .error { color: #f87171; padding: 1rem; background: #2a0a0a; border-radius: 6px; }
+  .error { color: #dc2626; padding: 1rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; }
 
-  .gate-layout { display: flex; gap: 1rem; min-height: 400px; }
-  .source-list { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+  .gate-layout { display: flex; gap: 1.25rem; min-height: 400px; }
+
+  .source-list {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    overflow: auto;
+  }
 
   .source-card {
     display: flex; flex-direction: column; gap: 0.15rem;
     padding: 0.6rem 0.75rem;
-    background: #1a1d2e;
-    border: 1px solid #2a2d3a;
-    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
     cursor: pointer;
     text-align: left;
-    color: #e0e0e8;
-    font-size: 0.8rem;
-    transition: border-color 0.15s;
+    color: #1a1a2e;
+    font-size: 0.82rem;
+    font-family: inherit;
+    transition: all 0.12s;
   }
-  .source-card:hover { border-color: #4a4f6a; }
-  .source-card.selected { border-color: #a5b4fc; background: #1e2030; }
+  .source-card:hover { border-color: #a5b4fc; background: #fafafe; }
+  .source-card.selected { border-color: #4338ca; background: #eef2ff; }
 
-  .source-type { color: #6b7280; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .source-type { color: #9ca3af; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
   .source-title { font-weight: 500; }
-  .freshness { font-size: 0.7rem; }
-  .candidate-count { color: #9ca3af; font-size: 0.7rem; }
+  .freshness { font-size: 0.72rem; }
+  .candidate-count { color: #6b7280; font-size: 0.72rem; }
 
-  .detail-pane { flex: 1; background: #1a1d2e; border: 1px solid #2a2d3a; border-radius: 6px; padding: 1rem; overflow: auto; }
-  .detail-header h3 { margin: 0 0 0.5rem; font-size: 1rem; }
-  .snapshot-info { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.75rem; color: #9ca3af; }
-  .snapshot-info code { color: #a5b4fc; font-size: 0.72rem; }
+  .detail-pane {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1.25rem;
+    overflow: auto;
+  }
 
-  .evidence-section, .candidates-section { margin-top: 1rem; }
-  h4 { margin: 0 0 0.5rem; font-size: 0.85rem; color: #9ca3af; }
+  .detail-header h2 { margin: 0 0 0.75rem; font-size: 1.1rem; font-weight: 600; color: #1a1a2e; }
 
-  .evidence-item { margin-bottom: 0.5rem; font-size: 0.8rem; }
-  .pointer-type { color: #6b7280; font-size: 0.7rem; margin-right: 0.25rem; }
-  .pointer-val { font-size: 0.72rem; color: #a5b4fc; }
-  blockquote { margin: 0.25rem 0 0 0; padding: 0.4rem 0.6rem; border-left: 2px solid #3b3f54; color: #d1d5db; font-size: 0.78rem; }
+  .snapshot-meta {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.75rem;
+    font-size: 0.78rem;
+    color: #6b7280;
+  }
+  .snapshot-meta dt { font-weight: 500; color: #9ca3af; }
+  .snapshot-meta dd { margin: 0; }
+  .snapshot-meta code { color: #4338ca; font-size: 0.75rem; }
+
+  .section { margin-top: 1.25rem; }
+  h3 { margin: 0 0 0.5rem; font-size: 0.88rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .evidence-item { margin-bottom: 0.5rem; font-size: 0.82rem; }
+  .pointer-type { color: #9ca3af; font-size: 0.72rem; margin-right: 0.25rem; }
+  .pointer-val { font-size: 0.75rem; color: #4338ca; }
+  blockquote {
+    margin: 0.25rem 0 0 0;
+    padding: 0.4rem 0.75rem;
+    border-left: 3px solid #e5e5e5;
+    color: #374151;
+    font-size: 0.82rem;
+    font-style: italic;
+    background: #f9fafb;
+    border-radius: 0 6px 6px 0;
+  }
 
   .candidate-row {
     display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
-    padding: 0.4rem 0.5rem;
-    border-bottom: 1px solid #2a2d3a;
-    font-size: 0.8rem;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.82rem;
   }
-  .candidate-row.rejected { opacity: 0.5; text-decoration: line-through; }
-  .candidate-summary { flex: 1; min-width: 200px; }
-  .feature-hint { color: #6b7280; font-size: 0.72rem; }
+  .candidate-row.rejected { opacity: 0.4; text-decoration: line-through; }
+  .candidate-summary { flex: 1; min-width: 200px; color: #1a1a2e; }
+  .feature-hint { color: #9ca3af; font-size: 0.72rem; }
 
   .badge {
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
     font-size: 0.68rem;
     font-weight: 500;
+    border: 1px solid;
   }
-  .collision { background: #3b0764; color: #c084fc; }
-  .review-state { background: #1e293b; color: #94a3b8; }
+  .collision { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; }
+  .review-state { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
 
   .btn-reject {
-    padding: 0.2rem 0.5rem; border: 1px solid #7f1d1d; background: #2a0a0a;
-    color: #f87171; border-radius: 4px; font-size: 0.72rem; cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid #fca5a5;
+    background: #fef2f2;
+    color: #dc2626;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.12s;
   }
-  .btn-reject:hover { background: #450a0a; }
+  .btn-reject:hover { background: #fee2e2; }
 
   .ingest-action { margin-top: 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
   .btn-ingest {
-    padding: 0.4rem 1rem; border: 1px solid #166534; background: #052e16;
-    color: #4ade80; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: pointer;
+    padding: 0.4rem 1rem;
+    border: 1px solid #6ee7b7;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.12s;
   }
-  .btn-ingest:hover { background: #064e3b; }
-  .ingest-hint { color: #6b7280; font-size: 0.72rem; }
+  .btn-ingest:hover { background: #a7f3d0; }
+  .ingest-hint { color: #9ca3af; font-size: 0.72rem; }
 
-  .empty-inline { color: #6b7280; font-size: 0.8rem; }
+  .empty-inline { color: #9ca3af; font-size: 0.82rem; }
 </style>

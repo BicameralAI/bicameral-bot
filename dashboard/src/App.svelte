@@ -6,93 +6,135 @@
   let activePage = $state<"ingestion" | "ledger">("ingestion");
 </script>
 
-<div class="app">
-  <header>
-    <h1>Bicameral</h1>
-    <nav>
+<div class="app-shell">
+  <header class="top-bar">
+    <span class="brand">BICAMERAL</span>
+    <Legend />
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
       <button
         class:active={activePage === "ingestion"}
         onclick={() => (activePage = "ingestion")}
       >
-        Ingestion Gate
+        <span class="nav-icon">◊</span>
+        <span>Ingestion Gate</span>
       </button>
       <button
         class:active={activePage === "ledger"}
         onclick={() => (activePage = "ledger")}
       >
-        Ledger View
+        <span class="nav-icon">☰</span>
+        <span>Ledger View</span>
       </button>
     </nav>
-    <Legend />
-  </header>
 
-  <main>
-    {#if activePage === "ingestion"}
-      <IngestionGate />
-    {:else}
-      <LedgerView />
-    {/if}
-  </main>
+    <main>
+      {#if activePage === "ingestion"}
+        <IngestionGate />
+      {:else}
+        <LedgerView />
+      {/if}
+    </main>
+  </div>
 </div>
 
 <style>
-  :global(body) {
+  :global(*) {
+    box-sizing: border-box;
     margin: 0;
-    font-family:
-      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #0f1117;
-    color: #e0e0e8;
+    padding: 0;
   }
 
-  .app {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+  :global(body) {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
+    background: #fafafa;
+    color: #1a1a2e;
+    -webkit-font-smoothing: antialiased;
   }
 
-  header {
+  :global(code) {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85em;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid #2a2d3a;
+    padding: 0.65rem 1.25rem;
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
   }
 
-  h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-    color: #a5b4fc;
+  .brand {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #1a1a2e;
   }
 
-  nav {
+  .layout {
     display: flex;
-    gap: 0.25rem;
+    flex: 1;
   }
 
-  nav button {
-    background: none;
-    border: 1px solid transparent;
+  .sidebar {
+    width: 180px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.75rem 0.5rem;
+    background: #fff;
+    border-right: 1px solid #e5e5e5;
+  }
+
+  .sidebar button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: none;
     border-radius: 6px;
-    padding: 0.4rem 0.75rem;
-    color: #9ca3af;
+    background: none;
+    color: #6b7280;
+    font-size: 0.82rem;
+    font-family: inherit;
     cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.15s;
+    transition: all 0.12s;
+    text-align: left;
   }
 
-  nav button:hover {
-    color: #e0e0e8;
-    background: #1e2030;
+  .sidebar button:hover {
+    background: #f3f4f6;
+    color: #1a1a2e;
   }
 
-  nav button.active {
-    color: #a5b4fc;
-    background: #1e2030;
-    border-color: #3b3f54;
+  .sidebar button.active {
+    background: #eef2ff;
+    color: #4338ca;
+    font-weight: 500;
+  }
+
+  .nav-icon {
+    font-size: 1rem;
+    width: 1.2rem;
+    text-align: center;
+    flex-shrink: 0;
   }
 
   main {
-    padding: 1.5rem 0;
+    flex: 1;
+    padding: 1.5rem 2rem;
+    overflow: auto;
   }
 </style>

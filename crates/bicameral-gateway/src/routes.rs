@@ -6,8 +6,12 @@ use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use bicameral_api::candidate::DecisionCandidate;
-use bicameral_api::dashboard::{DashboardReviewCommand, IngestionGateItem, LedgerReviewItem};
+use bicameral_api::dashboard::{
+    CandidateCommandKind, CandidatePreview, DashboardReviewCommand, IngestionGateItem,
+    LedgerCandidate, LedgerReviewItem,
+};
 use bicameral_api::review::{ReviewCommand, ReviewState, ReviewStatus};
+use bicameral_api::source::{Source, SourceFreshness, SourceSnapshot};
 use bicameral_audit::receipt::AuditAction;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -196,18 +200,126 @@ pub fn dashboard_api_routes() -> Router<AppState> {
 
 /// Returns the Ingestion Gate projection.
 ///
-/// In v0.1 this returns an empty list — real source snapshots are populated
-/// once connectors/extractors produce DecisionCandidates.
-async fn dashboard_ingestion_gate(State(_state): State<AppState>) -> Json<Vec<IngestionGateItem>> {
-    Json(Vec::new())
+/// Groups in-memory candidates by source, synthesising a Source/SourceSnapshot
+/// wrapper for each group so the dashboard can render them.
+async fn dashboard_ingestion_gate(State(state): State<AppState>) -> Json<Vec<IngestionGateItem>> {
+    let candidates = state.candidates.read().await;
+    let reviews = state.reviews.read().await;
+
+    // Group candidates by their source string.
+    let mut by_source: std::collections::HashMap<String, Vec<&DecisionCandidate>> =
+        std::collections::HashMap::new();
+    for c in candidates.values() {
+        by_source.entry(c.source.clone()).or_default().push(c);
+    }
+
+    let mut items: Vec<IngestionGateItem> = by_source
+        .into_iter()
+        .map(|(source_key, cands)| {
+            let earliest = cands
+                .iter()
+                .map(|c| c.extracted_at)
+                .min()
+                .unwrap_or_else(chrono::Utc::now);
+            let previews: Vec<CandidatePreview> = cands
+                .iter()
+                .map(|c| {
+                    let review_state = reviews
+                        .get(&c.id)
+                        .map(|r| format!("{:?}", r.status).to_lowercase());
+                    let confidence: Option<f64> = match c.extraction_confidence {
+                        bicameral_api::candidate::ExtractionConfidence::Low => Some(0.3),
+                        bicameral_api::candidate::ExtractionConfidence::Medium => Some(0.6),
+                        bicameral_api::candidate::ExtractionConfidence::High => Some(0.9),
+                    };
+                    CandidatePreview {
+                        id: Some(c.id.to_string()),
+                        summary: c.title.clone(),
+                        feature_hint: c.tags.first().cloned(),
+                        evidence_refs: Vec::new(),
+                        extraction_confidence: confidence,
+                        conflict_hint: None,
+                        review_state,
+                    }
+                })
+                .collect();
+
+            IngestionGateItem {
+                source: Source {
+                    uri: source_key.clone(),
+                    source_type: "ingested".to_string(),
+                },
+                snapshot: SourceSnapshot {
+                    snapshot_addr: format!("sha256:{:x}", md5_hash(&source_key)),
+                    snapshot_ref: source_key.clone(),
+                    captured_at: earliest,
+                },
+                source_title: source_key,
+                source_freshness: SourceFreshness::Unknown,
+                evidence: Vec::new(),
+                candidates: previews,
+                tracked: true,
+            }
+        })
+        .collect();
+
+    items.sort_by(|a, b| a.source_title.cmp(&b.source_title));
+    Json(items)
+}
+
+/// Trivial hash for generating deterministic snapshot addresses.
+fn md5_hash(s: &str) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    s.hash(&mut hasher);
+    hasher.finish()
 }
 
 /// Returns the Ledger View projection.
 ///
-/// In v0.1 this returns an empty list — real Decisions appear only after
-/// governed candidate promotion through the Ingestion Gate.
-async fn dashboard_ledger(State(_state): State<AppState>) -> Json<Vec<LedgerReviewItem>> {
-    Json(Vec::new())
+/// Maps in-memory candidates + review states into `LedgerCandidate` items.
+/// Promoted `LedgerDecision` items will appear once event-store governance
+/// materialises decisions.
+async fn dashboard_ledger(State(state): State<AppState>) -> Json<Vec<LedgerReviewItem>> {
+    let candidates = state.candidates.read().await;
+    let reviews = state.reviews.read().await;
+
+    let mut items: Vec<LedgerReviewItem> = candidates
+        .values()
+        .map(|c| {
+            let review_state = reviews
+                .get(&c.id)
+                .map(|r| format!("{:?}", r.status).to_lowercase())
+                .unwrap_or_else(|| "pending".to_string());
+
+            LedgerReviewItem::Candidate(LedgerCandidate {
+                id: c.id.to_string(),
+                summary: c.title.clone(),
+                feature_hint: c.tags.first().cloned(),
+                sources: Vec::new(),
+                review_state,
+                allowed_commands: vec![
+                    CandidateCommandKind::AcceptCandidate,
+                    CandidateCommandKind::RejectCandidate,
+                    CandidateCommandKind::RequestContext,
+                ],
+            })
+        })
+        .collect();
+
+    items.sort_by(|a, b| {
+        let summary_a = match a {
+            LedgerReviewItem::Decision(d) => &d.summary,
+            LedgerReviewItem::Candidate(c) => &c.summary,
+        };
+        let summary_b = match b {
+            LedgerReviewItem::Decision(d) => &d.summary,
+            LedgerReviewItem::Candidate(c) => &c.summary,
+        };
+        summary_a.cmp(summary_b)
+    });
+
+    Json(items)
 }
 
 /// Accepts a dashboard review command.
