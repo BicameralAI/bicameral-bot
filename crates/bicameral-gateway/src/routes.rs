@@ -6,9 +6,7 @@ use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use bicameral_api::candidate::DecisionCandidate;
-use bicameral_api::dashboard::{
-    DashboardReviewCommand, IngestionGateItem, LedgerReviewItem,
-};
+use bicameral_api::dashboard::{DashboardReviewCommand, IngestionGateItem, LedgerReviewItem};
 use bicameral_api::review::{ReviewCommand, ReviewState, ReviewStatus};
 use bicameral_audit::receipt::AuditAction;
 use serde::{Deserialize, Serialize};
@@ -200,9 +198,7 @@ pub fn dashboard_api_routes() -> Router<AppState> {
 ///
 /// In v0.1 this returns an empty list — real source snapshots are populated
 /// once connectors/extractors produce DecisionCandidates.
-async fn dashboard_ingestion_gate(
-    State(_state): State<AppState>,
-) -> Json<Vec<IngestionGateItem>> {
+async fn dashboard_ingestion_gate(State(_state): State<AppState>) -> Json<Vec<IngestionGateItem>> {
     Json(Vec::new())
 }
 
@@ -210,9 +206,7 @@ async fn dashboard_ingestion_gate(
 ///
 /// In v0.1 this returns an empty list — real Decisions appear only after
 /// governed candidate promotion through the Ingestion Gate.
-async fn dashboard_ledger(
-    State(_state): State<AppState>,
-) -> Json<Vec<LedgerReviewItem>> {
+async fn dashboard_ledger(State(_state): State<AppState>) -> Json<Vec<LedgerReviewItem>> {
     Json(Vec::new())
 }
 

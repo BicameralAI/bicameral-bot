@@ -232,10 +232,7 @@ mod tests {
         std::fs::write(dir.path().join("index.html"), "<html>dashboard</html>").unwrap();
 
         let app = build_router(test_state(), Some(dir.path()));
-        let req = Request::builder()
-            .uri("/")
-            .body(Body::empty())
-            .unwrap();
+        let req = Request::builder().uri("/").body(Body::empty()).unwrap();
         let resp = app.oneshot(req).await.unwrap();
         assert_eq!(resp.status(), StatusCode::OK);
 
