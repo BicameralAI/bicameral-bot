@@ -3,9 +3,21 @@
   "factory_repo": "BicameralAI/bicameral-factory",
   "factory_commit": "0202291be5ba90a1a5fbacc236f9df5a17c395b4",
   "loaded_context": [
+    "README.md",
+    "CONTRIBUTING.md",
     "playbooks/devin-bicameral-factory-run.md"
   ],
   "context_evidence": {
+    "README.md": {
+      "source": "agent-declared",
+      "reason": "Factory repo README read during playbook startup checklist.",
+      "sha256": "ec144df586c5a13ddba7d2f44101c31c592dbc22679e6c9a6d20e9c2429d58c1"
+    },
+    "CONTRIBUTING.md": {
+      "source": "agent-declared",
+      "reason": "Factory repo CONTRIBUTING read during playbook startup checklist.",
+      "sha256": "4ffc8f1cfd2c7708d707e0e5624a73380497f2f1cfe796da8c541d5d76c92fa5"
+    },
     "playbooks/devin-bicameral-factory-run.md": {
       "source": "agent-declared",
       "reason": "Canonical factory playbook governing this implementation run.",
